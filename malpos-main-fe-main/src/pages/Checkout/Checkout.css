@@ -1,0 +1,34 @@
+.pop-out-button {
+  transform: scale(1);
+  transition: transform 0.2s;
+}
+
+.pop-out-button:hover {
+  transform: scale(1.1);
+}
+
+.cus-margin {
+  margin-left: auto;
+}
+
+.cus-checkout-btn {
+  padding: 6px 45px 6px 45px;
+  border: 1px var(--primaryHEX) solid;
+  background-color: gainsboro;
+  color: var(--primaryHEX);
+  font-weight: bolder;
+}
+
+.cus-checkout-btn:hover {
+  box-shadow: 0px 8px 16px 0px var(--primaryHEX);
+  background-color: gainsboro;
+  color: var(--primaryHEX);
+  font-weight: bolder;
+}
+
+.cus-checkout-btn:active {
+  box-shadow: 0px 8px 16px 0px var(--primaryHEX);
+  background-color: gainsboro;
+  color: var(--primaryHEX);
+  font-weight: bolder;
+}
