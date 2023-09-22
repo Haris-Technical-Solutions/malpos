@@ -50,7 +50,6 @@ Route::resource('cdclients', CdClientController::class);
 
 Route::group(['middleware' => 'auth:sanctum'],function(){
 
-});
 
 
 Route::get('product_category/{id?}', [MdProductCategoryController::class, 'index'])->name('product_category');
@@ -225,6 +224,7 @@ Route::delete('cdbranch_delete/{id}', [CdBranchController::class, 'destroy'])->n
 Route::post('kds_status_update', [KdsController::class, 'update'])->name('kds_status_update');
 Route::post('show_kds', [KdsController::class, 'show_kds'])->name('show_kds');
 
+});
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

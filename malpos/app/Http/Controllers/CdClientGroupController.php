@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CdClientGroupCustom;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 //old
 use App\Models\CdClientGroup;
@@ -34,7 +35,7 @@ class CdClientGroupController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "group_name" => ['required',"string","unique:cd_client_group_customs"],
+            "group_name" => ['required',"string",Rule::unique('cd_client_group_customs')],
             "discount" => ['required',"numeric"],
             "type" => ['nullable',"string"],
         ]);
@@ -71,15 +72,18 @@ class CdClientGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dd($request->get("group_name"));
+        if(!CdClientGroupCustom::find($id)){
+            return response()->json(["error"=>"Sorry no record Found!"], 200);
+        }
         $validator = Validator::make($request->all(), [
-            "group_name" => ['required',"string"],
+            "group_name" => ['required',"string"
+            ,Rule::unique('cd_client_group_customs')->ignore($id)],
             "discount" => ['required',"numeric"],
             "type" => ['nullable',"string"],
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $data = $validator->validated();
         $data = array_filter($data, function ($value) {
