@@ -254,6 +254,7 @@ class MdProductController extends Controller
         $data->product_price = $request->input('product_price');
         $data->deleting_method = $request->input('deleting_method');
         $data->total_weight = $request->input('total_weight');
+        
         $data->barcode = $request->input('barcode');
         $data->maximun_day_of_product_return = $request->input('maximun_day_of_product_return');
         $data->cooking_time = $request->input('cooking_time');
