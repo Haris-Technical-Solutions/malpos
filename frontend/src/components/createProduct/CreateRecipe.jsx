@@ -59,7 +59,10 @@ const CreateRecipe = () => {
     // Update the ingredients state
     setIngredients(filteredIngredients);
   };
-
+  useEffect(() => {
+    console.log(allOptions, "update");
+    console.log(form.product_detail, "update===");
+  });
   const customStyles = {
     control: (provided) => ({
       ...provided,

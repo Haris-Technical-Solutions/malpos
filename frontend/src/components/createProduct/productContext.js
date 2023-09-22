@@ -7,7 +7,7 @@ export const ProductContext = createContext();
 export const ProductProvider = ({ children }) => {
   // States
   const [ingredients, setIngredients] = useState([
-    { ingredient: null, type: null },
+    { ingredient: null, type: null, gross: null, price: null },
   ]);
   const [clients, setClients] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -47,7 +47,7 @@ export const ProductProvider = ({ children }) => {
     deleting_method: "",
     totel_weight: 500,
     md_product_category_id: "2",
-    // md_station_id: "",
+    md_station_id: "",
     md_allergy_id: "",
     md_diet_id: "",
     is_active: 1,
@@ -293,28 +293,16 @@ export const ProductProvider = ({ children }) => {
       console.log(error);
     }
   };
-
-  // Handle Change Functions
-  const handleClientChange = (selectedIds) => {
-    const client_detail = selectedIds.map((value) => ({
-      cd_client_id: value,
-    }));
-
-    setClientDetails((prevClientDetails) => ({
-      ...prevClientDetails,
-      cd_client_id: client_detail,
-    }));
-
+  const handleClientChange = (e) => {
     setForm((prevForm) => ({
       ...prevForm,
-      // cd_client_id: selectedIds,
-      client_detail: client_detail,
+      cd_client_id: e.target.value,
     }));
   };
 
   const handleBrandChange = (selectedIds) => {
     const brand_detail = selectedIds.map((value) => ({
-      cd_brand_id: value,
+      cd_brands: value,
     }));
     setBrandDetails((prevBrandDetails) => ({
       ...prevBrandDetails,
@@ -323,14 +311,14 @@ export const ProductProvider = ({ children }) => {
     setForm((prevForm) => ({
       ...prevForm,
       cd_brand_id: selectedIds,
-      brand_detail: brand_detail,
+      product_brand: brand_detail,
     }));
   };
 
   const handleBranchChange = (selectedIds) => {
     debugger;
     const branch_detail = selectedIds.map((value) => ({
-      cd_branch_id: value,
+      cd_branches: value,
     }));
     setBrandDetails((prevBrandDetails) => ({
       ...prevBrandDetails,
@@ -339,13 +327,14 @@ export const ProductProvider = ({ children }) => {
     setForm((prevForm) => ({
       ...prevForm,
       cd_branch_id: selectedIds,
-      branch_detail: branch_detail,
+      product_branch: branch_detail,
     }));
   };
 
   const handleCategoryChange = (selectedIds) => {
+    debugger;
     const category_detail = selectedIds.map((value) => ({
-      md_product_category_id: value,
+      md_product_categories: value,
     }));
     setBrandDetails((prevBrandDetails) => ({
       ...prevBrandDetails,
@@ -354,36 +343,40 @@ export const ProductProvider = ({ children }) => {
     setForm((prevForm) => ({
       ...prevForm,
       md_product_category_id: selectedIds,
-      category_detail: category_detail,
+      product_category: category_detail,
     }));
   };
 
   const handleDietsChange = (selectedIds) => {
     const diet_detail = selectedIds.map((value) => ({
-      md_diet_id: value,
+      md_diets: value,
     }));
+
     setBrandDetails((prevBrandDetails) => ({
       ...prevBrandDetails,
       md_diet_id: diet_detail,
     }));
+
     setForm((prevForm) => ({
       ...prevForm,
       md_diet_id: selectedIds,
-      diet_detail: diet_detail,
+      product_diet: diet_detail,
     }));
   };
+
   const handleAllergyChange = (selectedIds) => {
     const allergy_detail = selectedIds.map((value) => ({
-      md_diet_id: value,
+      md_allergies: value,
     }));
+
     setBrandDetails((prevBrandDetails) => ({
       ...prevBrandDetails,
-      md_diet_id: allergy_detail,
+      md_allergy_id: allergy_detail,
     }));
     setForm((prevForm) => ({
       ...prevForm,
       md_allergy_id: selectedIds,
-      allergy_detail: allergy_detail,
+      product_allergy: allergy_detail,
     }));
   };
 
@@ -487,6 +480,7 @@ export const ProductProvider = ({ children }) => {
 
   const handleSelectChange = (newValue, index) => {
     // Deep cloning the ingredients array
+
     const newIngredients = JSON.parse(JSON.stringify(ingredients));
 
     // Updating the ingredient and type fields
@@ -500,31 +494,30 @@ export const ProductProvider = ({ children }) => {
   const handleSubmit = async (e) => {
     debugger;
     e.preventDefault();
+    console.log("ingredients submit", ingredients);
+    // const updatedIngredients = ingredients.map((item) => {
+    //   if (item && item.ingredient && item.ingredient.value) {
+    //     const originalValue = item.ingredient.value.replace(
+    //       /^(ingredient_|preparation_)/,
+    //       ""
+    //     );
 
-    const updatedIngredients = ingredients.map((item) => {
-      if (item && item.ingredient && item.ingredient.value) {
-        const originalValue = item.ingredient.value.replace(
-          /^(ingredient_|preparation_)/,
-          ""
-        );
+    //     return {
+    //       ...item,
+    //       ingredient: {
+    //         ...item.ingredient,
+    //         value: originalValue,
+    //       },
+    //     };
+    //   }
+    //   return item; // If it doesn't meet the criteria, return the original item
+    // });
 
-        // Replace the value in the original item with the originalValue
-        return {
-          ...item,
-          ingredient: {
-            ...item.ingredient,
-            value: originalValue,
-          },
-        };
-      }
-      return item; // If it doesn't meet the criteria, return the original item
-    });
-
-    const product_detail = updatedIngredients.map((ing, index) => ({
+    const product_detail = ingredients.map((ing, index) => ({
       md_detail_id: ing.ingredient ? ing.ingredient.value : null,
       product_type: ing.type,
       gross: ing.grossWeight,
-      cost: calculateCostPrice(ing),
+      cost: 1,
     }));
 
     const newForm = {

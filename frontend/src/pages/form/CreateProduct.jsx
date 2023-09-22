@@ -115,20 +115,35 @@ export default function CreateProduct() {
       });
     }
   }, []);
-
+  const getPreSelectIds = (productData, field) => {
+    console.log(productData, field);
+    const categoryIds = productData.map((item) => item[field]);
+    console.log("ids here ->>" + categoryIds, field);
+    return categoryIds;
+  };
   const fetchProductData = async () => {
     if (location.state?.id) {
       const id = location.state?.id;
       try {
         const response = await axiosInstance.get(`/product_edit/${id}`);
+        console.log(response, "response is here");
         const productData = response.data;
         setImagePreviewURL(productData.product_image);
         setForm((prevForm) => ({
           ...prevForm,
           cd_client_id: productData.cd_client_id,
-          cd_brand_id: productData.cd_brand_id,
-          cd_branch_id: productData.cd_branch_id,
-          md_product_category_id: productData.md_product_category_id,
+          cd_brand_id: getPreSelectIds(
+            productData.product_brand,
+            "cd_brand_id"
+          ),
+          cd_branch_id: getPreSelectIds(
+            productData.product_branch,
+            "cd_branch_id"
+          ),
+          md_product_category_id: getPreSelectIds(
+            productData.product_product_category,
+            "md_product_category_id"
+          ),
           td_tax_category_id: productData.td_tax_category_id,
           product_name: productData.product_name,
           maximun_day_of_product_return:
@@ -142,14 +157,21 @@ export default function CreateProduct() {
           barcode: productData.barcode,
           bundle: productData.bundle,
           not_allow_apply_discount: productData.not_allow_apply_discount,
-          md_allergy_id: productData.md_allergy_id,
+          md_allergy_id: getPreSelectIds(
+            productData.product_allergy,
+            "md_allergy_id"
+          ),
           md_menu_id: productData.md_menu_id,
           md_menu_section_id: productData.md_menu_section_id,
-          md_diet_id: productData.md_diet_id,
-          md_station_id: productData.md_station_id,
+          md_diet_id: getPreSelectIds(productData.product_diet, "md_diet_id"),
+          md_station_id: getPreSelectIds(
+            productData.station_product,
+            "md_station_id"
+          ),
           product_code: productData.product_code,
           product_price: productData.product_price,
           product_image: productData.product_image,
+          product_detail: productData.product_detail,
         }));
       } catch (error) {}
     }
@@ -217,13 +239,10 @@ export default function CreateProduct() {
                     <Col md={12}>
                       <Row>
                         <Col md={3}>
-                          <MultiSelectField
-                            required
-                            label="Role"
+                          <SelectField
+                            // className="w-50"
+                            label="Client"
                             name="cd_client_id"
-                            type="select"
-                            action={action}
-                            title="Client"
                             options={clients}
                             value={form.cd_client_id}
                             onChange={handleClientChange}
@@ -377,7 +396,7 @@ export default function CreateProduct() {
                         <Col md={4}>
                           <LabelField
                             label="Cooking Time"
-                            type="time"
+                            type={"text"}
                             name="cooking_time"
                             placeholder="Enter Cooking time"
                             value={form.cooking_time}
@@ -454,18 +473,18 @@ export default function CreateProduct() {
                             <Form.Check
                               type="checkbox"
                               label="Ignore Service Charges"
-                              name="not_allow_apply_discount"
-                              // value={form.not_allow_apply_discount}
-                              // checked={form.not_allow_apply_discount === 1}
-                              // onChange={handleCheckboxChange}
+                              name="ignory_service_charges"
+                              value={form.ignory_service_charges}
+                              checked={form.ignory_service_charges === 1}
+                              onChange={handleCheckboxChange}
                             />
                             <Form.Check
                               type="checkbox"
                               label="Bundle"
-                              name="not_allow_apply_discount"
-                              // value={form.not_allow_apply_discount}
-                              // checked={form.not_allow_apply_discount === 1}
-                              // onChange={handleCheckboxChange}
+                              name="bundle"
+                              value={form.bundle}
+                              checked={form.bundle === 1}
+                              onChange={handleCheckboxChange}
                             />
 
                             <Form.Check
