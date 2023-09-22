@@ -123,7 +123,7 @@ class UserController extends Controller
             $token = $user->createToken('MyApp')->plainTextToken;
 
             $auth_user = User::where('email', $request->email)->first();
-            $auth_user->token = $token;
+            $auth_user->api_token = $token;
             $auth_user->save();
 
 

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\CdClient;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 
 class CdClientController extends Controller
@@ -33,21 +35,27 @@ class CdClientController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            "name" => ['required',"string"],
+            "email" => ['required',"email",Rule::unique('cd_clients')],
+            "address" => ['required',"string"],
+            "phone_no" => ['required',"string"],
+            "client_role" => ['required',"string"],
+            "is_active" => ['required',"string"],
+            "country_id" => ['required',"string"],
+            "city_id" => ['required',"string"],
+            "created_by" => ['required',"string"],
+            "updated_by" => ['required',"string"],
+        ]);
 
-        $data = new CdClient();
-        $data->name = $request['name'];
-        $data->email = $request['email'];
-        $data->address = $request['address'];
-        $data->phone_no = $request['phone_no'];
-        $data->client_role = $request['client_role'];
-        $data->is_active = $request['is_active'];
-        $data->country_id = $request['country_id'];
-        $data->city_id = $request['city_id'];
-        $data->created_by = $request['created_by'];
-        $data->updated_by = $request['updated_by'];
-        $data->save();
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 401);
+        }
+        $data = $validator->validated();
+
+        CdClient::create($data);
         
-        return response()->json($data);
+        return response()->json(["message"=>"Client Created Succesfully!","data"=>$data]);
     }
 
     /**
@@ -65,11 +73,11 @@ class CdClientController extends Controller
      */
     public function edit( $id)
     {
-        $data = CdClient::find($id);
+        $data = CdClient::where("cd_client_id",$id)->first();
+        if(!$data){
+            return response()->json(["error"=>"Sorry no record Found!"]);
+        }
         return response()->json($data);
-
-
-
     }
 
     /**
@@ -78,22 +86,32 @@ class CdClientController extends Controller
     public function update(Request $request, $id)
     {
      
+        if(!CdClient::where("cd_client_id",$id)->first()){
+            return response()->json(["error"=>"Sorry no record Found!"]);
+        }
 
-        $data = CdClient::find($id);
-        $data->name = $request['name'];
-        $data->email = $request['email'];
-        $data->address = $request['address'];
-        $data->phone_no = $request['phone_no'];
-        $data->client_role = $request['client_role'];
-        $data->is_active = $request['is_active'];
-        $data->country_id = $request['country_id'];
-        $data->city_id = $request['city_id'];
-        $data->created_by = $request['created_by'];
-        $data->updated_by = $request['updated_by'];
-        $data->save();
+        $validator = Validator::make($request->all(), [
+            "name" => ['required',"string"],
+            "email" => ['required',"email",Rule::unique('cd_clients')->whereNot("cd_client_id",$id)],
+            "address" => ['required',"string"],
+            "phone_no" => ['required',"string"],
+            "client_role" => ['required',"string"],
+            "is_active" => ['required',"string"],
+            "country_id" => ['required',"string"],
+            "city_id" => ['required',"string"],
+            "created_by" => ['required',"string"],
+            "updated_by" => ['required',"string"],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 401);
+        }
+        $data = $validator->validated();
+
+        CdClient::where("cd_client_id",$id)->update($data);
         
-        return response()->json($data);
-
+        return response()->json(["message"=>"Client Updated Succesfully!","data"=>$data]);
+        
     }
 
     /**
@@ -101,9 +119,7 @@ class CdClientController extends Controller
      */
     public function destroy($id)
     {
-        //
-        $data = CdClient::find($id);
-        $data->delete();
-        return response()->json($data);
+        $data = CdClient::where("cd_client_id",$id)->delete();
+        return response()->json(["message"=>"Client Deleted Succesfully!"]);
     }
 }

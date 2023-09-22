@@ -46,10 +46,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::resource('cdclients', CdClientController::class);
+Route::post('user_login', [UserController::class, 'loginUser'])->name('user_login');
+Route::post('brand_login', [UserController::class, 'loginBrand'])->name('brand_login');
+Route::post('pin_login', [UserController::class, 'loginPin'])->name('pin_login');
 
-Route::group(['middleware' => 'auth:sanctum'],function(){
-});
+Route::group([
+    // 'middleware' => 'auth:sanctum'
+],function(){
 
 
 
@@ -97,9 +100,8 @@ Route::post('user_store', [UserController::class, 'store'])->name('user_store');
 Route::post('user_update/{id}', [UserController::class, 'update'])->name('user_update');
 Route::get('user_edit/{id}', [UserController::class, 'edit'])->name('user_edit');
 Route::delete('user_delete/{id}', [UserController::class, 'destroy'])->name('user_delete');
-Route::post('user_login', [UserController::class, 'loginUser'])->name('user_login');
-Route::post('brand_login', [UserController::class, 'loginBrand'])->name('brand_login');
-Route::post('pin_login', [UserController::class, 'loginPin'])->name('pin_login');
+
+
 
 
 Route::post('role_store', [CdRoleController::class, 'store'])->name('role_store');
@@ -194,13 +196,14 @@ Route::post('check_pin', [UserController::class, 'checkPin'])->name('check_pin')
 
 
 
-
-Route::get('cdclient', [CdClientController::class, 'index'])->name('cdclient');
-Route::post('cdclient_store', [CdClientController::class, 'store'])->name('cdclient_store');
+Route::resource('cdclients', CdClientController::class);
+// Route::get('cdclient', [CdClientController::class, 'index'])->name('cdclient');
+// Route::post('cdclient_store', [CdClientController::class, 'store'])->name('cdclient_store');
 Route::post('cdclient_update/{id}', [CdClientController::class, 'update'])->name('cdclient_update');
-Route::get('cdclient_edit/{id}', [CdClientController::class, 'edit'])->name('cdclient_edit');
-Route::delete('cdclient_delete/{id}', [CdClientController::class, 'destroy'])->name('cdclient_delete');
+// Route::get('cdclient_edit/{id}', [CdClientController::class, 'edit'])->name('cdclient_edit');
+// Route::delete('cdclient_delete/{id}', [CdClientController::class, 'destroy'])->name('cdclient_delete');
 //haris client group
+
 Route::resource("cdclientgroup",CdClientGroupController::class);
 Route::post("cdclientgroup/update/{id}",[CdClientGroupController::class,"update"]);
 Route::get('cduser', [CdUserController::class, 'index'])->name('cduser');
@@ -225,6 +228,7 @@ Route::delete('cdbranch_delete/{id}', [CdBranchController::class, 'destroy'])->n
 Route::post('kds_status_update', [KdsController::class, 'update'])->name('kds_status_update');
 Route::post('show_kds', [KdsController::class, 'show_kds'])->name('show_kds');
 
+});
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
