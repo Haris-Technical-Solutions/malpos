@@ -17,7 +17,9 @@ import { faPlus, faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 import IconSearchBar from "../../components/elements/IconSearchBar";
 import axiosInstance from "../../api/baseUrl";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "react-toastify"; 
+
+
 // import "./ManageModifers.css";
 import CustomPagination from "../../components/CustomPagination";
 
