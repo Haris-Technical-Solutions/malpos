@@ -3,6 +3,7 @@
 use App\Http\Controllers\CdBranchController;
 use App\Http\Controllers\CdBrandController;
 use App\Http\Controllers\CdClientController;
+use App\Http\Controllers\CdClientGroupController;
 use App\Http\Controllers\CdRoleController;
 use App\Http\Controllers\CdUserController;
 use App\Http\Controllers\GdCountryController;
@@ -48,6 +49,7 @@ use Illuminate\Support\Facades\Route;
 Route::resource('cdclients', CdClientController::class);
 
 Route::group(['middleware' => 'auth:sanctum'],function(){
+
 });
 
 
@@ -198,7 +200,9 @@ Route::post('cdclient_store', [CdClientController::class, 'store'])->name('cdcli
 Route::post('cdclient_update/{id}', [CdClientController::class, 'update'])->name('cdclient_update');
 Route::get('cdclient_edit/{id}', [CdClientController::class, 'edit'])->name('cdclient_edit');
 Route::delete('cdclient_delete/{id}', [CdClientController::class, 'destroy'])->name('cdclient_delete');
-
+//haris client group
+Route::resource("cdclientgroup",CdClientGroupController::class);
+Route::post("cdclientgroup/update/{id}",[CdClientGroupController::class,"update"]);
 Route::get('cduser', [CdUserController::class, 'index'])->name('cduser');
 Route::post('cduser_store', [CdUserController::class, 'store'])->name('cduser_store');
 Route::post('cduser_update/{id}', [CdUserController::class, 'update'])->name('cduser_update');

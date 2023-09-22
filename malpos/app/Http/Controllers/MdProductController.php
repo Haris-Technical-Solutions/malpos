@@ -228,7 +228,17 @@ class MdProductController extends Controller
     public function edit( $id)
     {
         //
-        $data = MdProduct::find($id);
+        $data = MdProduct::with([
+            'product_brand',
+            'product_branch',
+            'product_product_category',
+            'station_product',
+            'product_diet',
+            'product_allergy',
+            'product_detail',
+            'product_modifier',
+        ])
+        ->find($id);
         return response()->json($data);
     }
 

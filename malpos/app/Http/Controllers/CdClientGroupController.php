@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CdClientGroupCustom;
+use Illuminate\Support\Facades\Validator;
+
+//old
 use App\Models\CdClientGroup;
+//
 use Illuminate\Http\Request;
 
 class CdClientGroupController extends Controller
@@ -12,7 +17,7 @@ class CdClientGroupController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(['client_groups' => CdClientGroupCustom::all()],200);
     }
 
     /**
@@ -28,7 +33,21 @@ class CdClientGroupController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            "group_name" => ['required',"string","unique:cd_client_group_customs"],
+            "discount" => ['required',"numeric"],
+            "type" => ['nullable',"string"],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()], 401);
+        }
+        $data = $validator->validated();
+        $data = array_filter($data, function ($value) {
+            return $value !== null;
+        });
+        CdClientGroupCustom::create($data);
+        return response()->json(['message' => 'Customer Group Created Successfully'],200);
     }
 
     /**
@@ -42,24 +61,40 @@ class CdClientGroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(CdClientGroup $cdClientGroup)
+    public function edit($id)
     {
-        //
+        return response()->json(['client_group' => CdClientGroupCustom::where('id',$id)->first()],200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, CdClientGroup $cdClientGroup)
+    public function update(Request $request, $id)
     {
-        //
+        // dd($request->get("group_name"));
+        $validator = Validator::make($request->all(), [
+            "group_name" => ['required',"string"],
+            "discount" => ['required',"numeric"],
+            "type" => ['nullable',"string"],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['message' => $validator->errors()], 401);
+        }
+        $data = $validator->validated();
+        $data = array_filter($data, function ($value) {
+            return $value !== null;
+        });
+        CdClientGroupCustom::where('id',$id)->update($data);
+        return response()->json(['message' => 'Customer Group Updated Successfully'],200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(CdClientGroup $cdClientGroup)
+    public function destroy( $id)
     {
-        //
+        CdClientGroupCustom::where('id',$id)->delete();
+        return response()->json(['message' => 'Customer Group Deleted Successfully'],200);
     }
 }
