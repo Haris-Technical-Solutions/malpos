@@ -39,6 +39,8 @@ class MdCustomerGroupController extends Controller
             "cd_branch_id" => ['required',"numeric"],
 
             "type" => ['nullable',"string"],
+            "created_by" => ['nullable',"string"],
+            "updated_by" => ['nullable',"string"],
         ]);
 
         if ($validator->fails()) {
@@ -85,6 +87,8 @@ class MdCustomerGroupController extends Controller
             "cd_branch_id" => ['required',"numeric"],
 
             "type" => ['nullable',"string"],
+            "created_by" => ['nullable',"string"],
+            "updated_by" => ['nullable',"string"],
         ]);
 
         if ($validator->fails()) {

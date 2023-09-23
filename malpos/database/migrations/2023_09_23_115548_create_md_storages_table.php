@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string("name");
             $table->boolean("is_active")->default(1);
             $table->integer("write_off_sequence")->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

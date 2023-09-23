@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string("group_name");
             $table->double("discount");
             $table->enum("type",["fixed","percentage"])->default("percentage")->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }

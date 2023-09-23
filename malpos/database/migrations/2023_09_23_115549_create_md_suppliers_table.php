@@ -12,13 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('md_suppliers', function (Blueprint $table) {
-            $table->id('md_supplier_id');
+            $table->id();
             $table->foreignId('cd_client_id')->on('cd_clients');
             $table->foreignId('cd_brand_id')->on('cd_brands');
             $table->foreignId('cd_branch_id')->on('cd_branchs');
-            $table->boolean('is_active');
-            $table->string('created_by');
-            $table->string('updated_by');
+            $table->string("supplier_name");
+            $table->string("phone");
+            $table->string("tin")->nullable();
+            $table->string("description")->nullable();
+            $table->boolean('is_active')->nullable();
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
             $table->timestamps();
         });
     }
