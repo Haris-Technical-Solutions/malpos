@@ -31,12 +31,15 @@ class MdCustomerGroupController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "group_name" => ['required',"string",Rule::unique('md_customer_groups')],
             "discount" => ['required',"numeric"],
 
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
+            "group_name" => ['required',"string",Rule::unique('md_customer_groups')
+            ->where("cd_client_id",$request->cd_client_id)
+            ->where("cd_brand_id",$request->cd_brand_id)
+            ->where("cd_branch_id",$request->cd_branch_id)],
 
             "type" => ['nullable',"string"],
             "created_by" => ['nullable',"string"],
@@ -79,12 +82,16 @@ class MdCustomerGroupController extends Controller
             return response()->json(["error"=>"Sorry no record Found!"], 200);
         }
         $validator = Validator::make($request->all(), [
-            "group_name" => ['required',"string", Rule::unique('md_customer_groups')->ignore($id)],
             "discount" => ['required',"numeric"],
 
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
+            
+            "group_name" => ['required',"string", Rule::unique('md_customer_groups')
+            ->where("cd_client_id",$request->cd_client_id)
+            ->where("cd_brand_id",$request->cd_brand_id)
+            ->where("cd_branch_id",$request->cd_branch_id)->ignore($id)],
 
             "type" => ['nullable',"string"],
             "created_by" => ['nullable',"string"],

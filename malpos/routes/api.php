@@ -31,6 +31,8 @@ use App\Http\Controllers\GdCityController;
 use App\Http\Controllers\MdCustomerController;
 use App\Http\Controllers\MdCustomerGroupController;
 use App\Http\Controllers\MdStorageController;
+use App\Http\Controllers\MdSupplierController;
+use App\Http\Controllers\MdSupplyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -219,6 +221,12 @@ Route::post("md_customer_group/update/{id}",[MdCustomerGroupController::class,"u
 
 Route::resource("md_storage",MdStorageController::class);
 Route::post("md_storage/update/{id}",[MdStorageController::class,"update"]);
+
+Route::resource("md_supplier",MdSupplierController::class);
+Route::post("md_supplier/update/{id}",[MdSupplierController::class,"update"]);
+
+Route::resource("md_supply",MdSupplyController::class);
+Route::post("md_supply/update/{id}",[MdSupplyController::class,"update"]);
 
 Route::get('cduser', [CdUserController::class, 'index'])->name('cduser');
 Route::post('cduser_store', [CdUserController::class, 'store'])->name('cduser_store');
