@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cd_client_group_customs', function (Blueprint $table) {
+        Schema::create('md_customer_groups', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cd_client_id')->on('cd_clients');
+            $table->foreignId('cd_brand_id')->on('cd_brands');
+            $table->foreignId('cd_branch_id')->on('cd_branchs');
             $table->string("group_name");
             $table->double("discount");
             $table->enum("type",["fixed","percentage"])->default("percentage")->nullable();
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cd_client_group_customs');
+        Schema::dropIfExists('md_customer_groups');
     }
 };

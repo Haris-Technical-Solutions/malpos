@@ -122,4 +122,7 @@ class CdClientController extends Controller
         $data = CdClient::where("cd_client_id",$id)->delete();
         return response()->json(["message"=>"Client Deleted Succesfully!"]);
     }
+    public function client_details(){
+        
+    }
 }

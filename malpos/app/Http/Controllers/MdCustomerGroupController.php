@@ -2,23 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CdClientGroupCustom;
+use Illuminate\Http\Request;
+use App\Models\MdCustomerGroup;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-//old
-use App\Models\CdClientGroup;
-//
-use Illuminate\Http\Request;
-
-class CdClientGroupController extends Controller
+class MdCustomerGroupController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return response()->json(['client_groups' => CdClientGroupCustom::all()],200);
+        return response()->json(MdCustomerGroup::all(),200);
     }
 
     /**
@@ -35,8 +31,13 @@ class CdClientGroupController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "group_name" => ['required',"string",Rule::unique('cd_client_group_customs')],
+            "group_name" => ['required',"string",Rule::unique('md_customer_groups')],
             "discount" => ['required',"numeric"],
+
+            "cd_client_id" => ['required',"numeric"],
+            "cd_brand_id" => ['required',"numeric"],
+            "cd_branch_id" => ['required',"numeric"],
+
             "type" => ['nullable',"string"],
         ]);
 
@@ -47,14 +48,14 @@ class CdClientGroupController extends Controller
         $data = array_filter($data, function ($value) {
             return $value !== null;
         });
-        CdClientGroupCustom::create($data);
+        MdCustomerGroup::create($data);
         return response()->json(['message' => 'Customer Group Created Successfully'],200);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(CdClientGroup $cdClientGroup)
+    public function show(MdCustomerGroup $MdCustomerGroup)
     {
         //
     }
@@ -64,7 +65,7 @@ class CdClientGroupController extends Controller
      */
     public function edit($id)
     {
-        return response()->json(['client_group' => CdClientGroupCustom::where('id',$id)->first()],200);
+        return response()->json(MdCustomerGroup::where('id',$id)->first(),200);
     }
 
     /**
@@ -72,13 +73,17 @@ class CdClientGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(!CdClientGroupCustom::find($id)){
+        if(!MdCustomerGroup::find($id)){
             return response()->json(["error"=>"Sorry no record Found!"], 200);
         }
         $validator = Validator::make($request->all(), [
-            "group_name" => ['required',"string"
-            ,Rule::unique('cd_client_group_customs')->ignore($id)],
+            "group_name" => ['required',"string", Rule::unique('md_customer_groups')->ignore($id)],
             "discount" => ['required',"numeric"],
+
+            "cd_client_id" => ['required',"numeric"],
+            "cd_brand_id" => ['required',"numeric"],
+            "cd_branch_id" => ['required',"numeric"],
+
             "type" => ['nullable',"string"],
         ]);
 
@@ -89,8 +94,8 @@ class CdClientGroupController extends Controller
         $data = array_filter($data, function ($value) {
             return $value !== null;
         });
-        CdClientGroupCustom::where('id',$id)->update($data);
-        return response()->json(['message' => 'Customer Group Updated Successfully'],200);
+        $updated = MdCustomerGroup::where('id',$id)->update($data);
+        return response()->json(['message' => 'Customer Group Updated Successfully',"data" => MdCustomerGroup::where('id',$id)->first()],200);
     }
 
     /**
@@ -98,7 +103,10 @@ class CdClientGroupController extends Controller
      */
     public function destroy( $id)
     {
-        CdClientGroupCustom::where('id',$id)->delete();
+        if(!MdCustomerGroup::find($id)){
+            return response()->json(["error"=>"Sorry no record Found!"], 200);
+        }
+        MdCustomerGroup::where('id',$id)->delete();
         return response()->json(['message' => 'Customer Group Deleted Successfully'],200);
     }
 }

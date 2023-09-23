@@ -3,7 +3,7 @@
 use App\Http\Controllers\CdBranchController;
 use App\Http\Controllers\CdBrandController;
 use App\Http\Controllers\CdClientController;
-use App\Http\Controllers\CdClientGroupController;
+// use App\Http\Controllers\CdClientGroupController;
 use App\Http\Controllers\CdRoleController;
 use App\Http\Controllers\CdUserController;
 use App\Http\Controllers\GdCountryController;
@@ -27,6 +27,10 @@ use App\Http\Controllers\TdTaxCategoryController;
 use App\Http\Controllers\TdTaxRateController;
 use App\Http\Controllers\MdModifierController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GdCityController;
+use App\Http\Controllers\MdCustomerController;
+use App\Http\Controllers\MdCustomerGroupController;
+use App\Http\Controllers\MdStorageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -197,15 +201,25 @@ Route::post('check_pin', [UserController::class, 'checkPin'])->name('check_pin')
 
 
 Route::resource('cdclients', CdClientController::class);
-// Route::get('cdclient', [CdClientController::class, 'index'])->name('cdclient');
+
+Route::get('get_country', [GdCityController::class, 'get_country']);
+Route::get('get_city/{country}', [GdCityController::class, 'get_city']);
+
 // Route::post('cdclient_store', [CdClientController::class, 'store'])->name('cdclient_store');
 Route::post('cdclient_update/{id}', [CdClientController::class, 'update'])->name('cdclient_update');
 // Route::get('cdclient_edit/{id}', [CdClientController::class, 'edit'])->name('cdclient_edit');
 // Route::delete('cdclient_delete/{id}', [CdClientController::class, 'destroy'])->name('cdclient_delete');
 //haris client group
 
-Route::resource("cdclientgroup",CdClientGroupController::class);
-Route::post("cdclientgroup/update/{id}",[CdClientGroupController::class,"update"]);
+Route::resource("md_customer",MdCustomerController::class);
+Route::resource("md_customer_group",MdCustomerGroupController::class);
+
+Route::post('md_customer/update/{id}', [MdCustomerController::class, 'update'])->name('md_customer_update');
+Route::post("md_customer_group/update/{id}",[MdCustomerGroupController::class,"update"]);
+
+Route::resource("md_storage",MdStorageController::class);
+Route::post("md_storage/update/{id}",[MdStorageController::class,"update"]);
+
 Route::get('cduser', [CdUserController::class, 'index'])->name('cduser');
 Route::post('cduser_store', [CdUserController::class, 'store'])->name('cduser_store');
 Route::post('cduser_update/{id}', [CdUserController::class, 'update'])->name('cduser_update');
