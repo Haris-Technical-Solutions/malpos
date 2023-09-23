@@ -225,8 +225,8 @@ Route::post("md_storage/update/{id}",[MdStorageController::class,"update"]);
 Route::resource("md_supplier",MdSupplierController::class);
 Route::post("md_supplier/update/{id}",[MdSupplierController::class,"update"]);
 
-Route::resource("md_supply",MdSupplyController::class);
-Route::post("md_supply/update/{id}",[MdSupplyController::class,"update"]);
+Route::resource("md_supplies",MdSupplyController::class);
+Route::post("md_supplies/update/{id}",[MdSupplyController::class,"update"]);
 
 Route::get('cduser', [CdUserController::class, 'index'])->name('cduser');
 Route::post('cduser_store', [CdUserController::class, 'store'])->name('cduser_store');

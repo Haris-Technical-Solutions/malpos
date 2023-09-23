@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\MdSupplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Models\MdSupplier;
 
 class MdSupplierController extends Controller
 {
