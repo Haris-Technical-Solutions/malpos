@@ -24,6 +24,10 @@ class MdProduct extends Model
         return $this->belongsTo(CdClient::class, 'cd_client_id');
     }
 
+    public function supply_lines(){
+        return $this->belongsTo(MdSupplyLine::class, 'md_product_id');
+    }
+
     public function product_detail(){
         return $this->hasMany(MdProductDetail::class, 'md_product_id');
     }
@@ -57,7 +61,7 @@ class MdProduct extends Model
     }
 
     public function getProductImageAttribute()
-{
-    return asset('img/product_image/'.$this->attributes['product_image']);
-}
+    {
+        return asset('img/product_image/'.$this->attributes['product_image']);
+    }
 }

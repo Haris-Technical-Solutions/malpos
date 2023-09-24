@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\GdCity;
+use App\Models\City;
 use Illuminate\Http\Request;
 
 class GdCityController extends Controller
 {
+    public function get_country(){
+        return City::groupBy("country")->select("country")->get()->pluck("country");
+    }
+    public function get_city($country){
+        return City::where("country",$country)->select("city")->get()->pluck("city");
+    }
     /**
      * Display a listing of the resource.
      */

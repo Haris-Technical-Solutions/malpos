@@ -3,7 +3,7 @@
 use App\Http\Controllers\CdBranchController;
 use App\Http\Controllers\CdBrandController;
 use App\Http\Controllers\CdClientController;
-use App\Http\Controllers\CdClientGroupController;
+// use App\Http\Controllers\CdClientGroupController;
 use App\Http\Controllers\CdRoleController;
 use App\Http\Controllers\CdUserController;
 use App\Http\Controllers\GdCountryController;
@@ -27,6 +27,13 @@ use App\Http\Controllers\TdTaxCategoryController;
 use App\Http\Controllers\TdTaxRateController;
 use App\Http\Controllers\MdModifierController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GdCityController;
+use App\Http\Controllers\MdCustomerController;
+use App\Http\Controllers\MdCustomerGroupController;
+use App\Http\Controllers\MdStorageController;
+use App\Http\Controllers\MdSupplierController;
+use App\Http\Controllers\MdSupplyController;
+use App\Http\Controllers\MdStockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,10 +53,13 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::resource('cdclients', CdClientController::class);
+Route::post('user_login', [UserController::class, 'loginUser'])->name('user_login');
+Route::post('brand_login', [UserController::class, 'loginBrand'])->name('brand_login');
+Route::post('pin_login', [UserController::class, 'loginPin'])->name('pin_login');
 
-Route::group(['middleware' => 'auth:sanctum'],function(){
-});
+Route::group([
+    // 'middleware' => 'auth:sanctum'
+],function(){
 
 
 
@@ -97,9 +107,8 @@ Route::post('user_store', [UserController::class, 'store'])->name('user_store');
 Route::post('user_update/{id}', [UserController::class, 'update'])->name('user_update');
 Route::get('user_edit/{id}', [UserController::class, 'edit'])->name('user_edit');
 Route::delete('user_delete/{id}', [UserController::class, 'destroy'])->name('user_delete');
-Route::post('user_login', [UserController::class, 'loginUser'])->name('user_login');
-Route::post('brand_login', [UserController::class, 'loginBrand'])->name('brand_login');
-Route::post('pin_login', [UserController::class, 'loginPin'])->name('pin_login');
+
+
 
 
 Route::post('role_store', [CdRoleController::class, 'store'])->name('role_store');
@@ -194,15 +203,34 @@ Route::post('check_pin', [UserController::class, 'checkPin'])->name('check_pin')
 
 
 
+Route::resource('cdclients', CdClientController::class);
 
-Route::get('cdclient', [CdClientController::class, 'index'])->name('cdclient');
-Route::post('cdclient_store', [CdClientController::class, 'store'])->name('cdclient_store');
+Route::get('get_stock', [MdStockController::class, 'index']);
+
+Route::get('get_country', [GdCityController::class, 'get_country']);
+Route::get('get_city/{country}', [GdCityController::class, 'get_city']);
+
+// Route::post('cdclient_store', [CdClientController::class, 'store'])->name('cdclient_store');
 Route::post('cdclient_update/{id}', [CdClientController::class, 'update'])->name('cdclient_update');
-Route::get('cdclient_edit/{id}', [CdClientController::class, 'edit'])->name('cdclient_edit');
-Route::delete('cdclient_delete/{id}', [CdClientController::class, 'destroy'])->name('cdclient_delete');
+// Route::get('cdclient_edit/{id}', [CdClientController::class, 'edit'])->name('cdclient_edit');
+// Route::delete('cdclient_delete/{id}', [CdClientController::class, 'destroy'])->name('cdclient_delete');
 //haris client group
-Route::resource("cdclientgroup",CdClientGroupController::class);
-Route::post("cdclientgroup/update/{id}",[CdClientGroupController::class,"update"]);
+
+Route::resource("md_customer",MdCustomerController::class);
+Route::resource("md_customer_group",MdCustomerGroupController::class);
+
+Route::post('md_customer/update/{id}', [MdCustomerController::class, 'update'])->name('md_customer_update');
+Route::post("md_customer_group/update/{id}",[MdCustomerGroupController::class,"update"]);
+
+Route::resource("md_storage",MdStorageController::class);
+Route::post("md_storage/update/{id}",[MdStorageController::class,"update"]);
+
+Route::resource("md_supplier",MdSupplierController::class);
+Route::post("md_supplier/update/{id}",[MdSupplierController::class,"update"]);
+
+Route::resource("md_supplies",MdSupplyController::class);
+Route::post("md_supplies/update/{id}",[MdSupplyController::class,"update"]);
+
 Route::get('cduser', [CdUserController::class, 'index'])->name('cduser');
 Route::post('cduser_store', [CdUserController::class, 'store'])->name('cduser_store');
 Route::post('cduser_update/{id}', [CdUserController::class, 'update'])->name('cduser_update');
@@ -225,6 +253,7 @@ Route::delete('cdbranch_delete/{id}', [CdBranchController::class, 'destroy'])->n
 Route::post('kds_status_update', [KdsController::class, 'update'])->name('kds_status_update');
 Route::post('show_kds', [KdsController::class, 'show_kds'])->name('show_kds');
 
+});
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

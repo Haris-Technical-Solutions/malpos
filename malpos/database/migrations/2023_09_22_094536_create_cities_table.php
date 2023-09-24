@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cd_client_group_customs', function (Blueprint $table) {
-            $table->id();
-            $table->string("group_name");
-            $table->double("discount");
-            $table->enum("type",["fixed","percentage"])->default("percentage")->nullable();
+        Schema::create('cities', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string("city");
+            $table->string("country");
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cd_client_group_customs');
+        Schema::dropIfExists('cities');
     }
 };

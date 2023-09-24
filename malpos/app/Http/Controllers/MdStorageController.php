@@ -3,18 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\MdStorage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use App\Models\MdSupplier;
 
-class MdSupplierController extends Controller
+class MdStorageController extends Controller
 {
      /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return response()->json(MdSupplier::all(),200);
+        return response()->json(MdStorage::all(),200);
     }
 
     /**
@@ -31,18 +31,15 @@ class MdSupplierController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            "supplier_name" => ['required',"string"],
+            "is_active" => ['nullable',"numeric"],
+            "write_off_sequence" => ['nullable',"numeric"],
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
-            "phone" => ['required',"string",Rule::unique('md_suppliers')
-                ->where("cd_client_id",$request->cd_client_id)
-                ->where("cd_brand_id",$request->cd_brand_id)
-                ->where("cd_branch_id",$request->cd_branch_id)],
-
-            "tin" => ['nullable',"string"],
-            "description" => ['nullable',"string"],
-            "is_active" => ['nullable',"string"],
+            "name" => ['required',"string",Rule::unique('md_storages')
+            ->where("cd_client_id",$request->cd_client_id)
+            ->where("cd_brand_id",$request->cd_brand_id)
+            ->where("cd_branch_id",$request->cd_branch_id)],
             "created_by" => ['nullable',"string"],
             "updated_by" => ['nullable',"string"],
         ]);
@@ -54,14 +51,14 @@ class MdSupplierController extends Controller
         $data = array_filter($data, function ($value) {
             return $value !== null;
         });
-        MdSupplier::create($data);
-        return response()->json(['message' => 'Supplier Created Successfully'],200);
+        MdStorage::create($data);
+        return response()->json(['message' => 'Storage Created Successfully'],200);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(MdSupplier $MdSupplier)
+    public function show(MdCustomerGroup $MdCustomerGroup)
     {
         //
     }
@@ -71,10 +68,10 @@ class MdSupplierController extends Controller
      */
     public function edit($id)
     {
-        if(!MdSupplier::find($id)){
+        if(!MdStorage::find($id)){
             return response()->json(["error"=>"Sorry no record Found!"], 200);
         }
-        return response()->json(MdSupplier::where('id',$id)->first(),200);
+        return response()->json(MdStorage::where('id',$id)->first(),200);
     }
 
     /**
@@ -82,22 +79,20 @@ class MdSupplierController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(!MdSupplier::find($id)){
+        if(!MdStorage::find($id)){
             return response()->json(["error"=>"Sorry no record Found!"], 200);
         }
         $validator = Validator::make($request->all(), [
-            "supplier_name" => ['required',"string"],
+            "is_active" => ['nullable',"numeric"],
+            "write_off_sequence" => ['nullable',"numeric"],
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
-            "phone" => ['required',"string",Rule::unique('md_suppliers')
-            ->where("cd_client_id",$request->cd_client_id)
-            ->where("cd_brand_id",$request->cd_brand_id)
-            ->where("cd_branch_id",$request->cd_branch_id)->ignore($id)],
-
-            "tin" => ['nullable',"string"],
-            "description" => ['nullable',"string"],
-            "is_active" => ['nullable',"string"],
+            "name" => ['required',"string",Rule::unique('md_storages')
+                ->where("cd_client_id",$request->cd_client_id)
+                ->where("cd_brand_id",$request->cd_brand_id)
+                ->where("cd_branch_id",$request->cd_branch_id)
+                ->ignore($id)],
             "created_by" => ['nullable',"string"],
             "updated_by" => ['nullable',"string"],
         ]);
@@ -109,8 +104,8 @@ class MdSupplierController extends Controller
         $data = array_filter($data, function ($value) {
             return $value !== null;
         });
-        $updated = MdSupplier::where('id',$id)->update($data);
-        return response()->json(['message' => 'Supplier Updated Successfully',"data" => MdSupplier::where('id',$id)->first()],200);
+        $updated = MdStorage::where('id',$id)->update($data);
+        return response()->json(['message' => 'Storage Updated Successfully',"data" => MdStorage::where('id',$id)->first()],200);
     }
 
     /**
@@ -118,10 +113,10 @@ class MdSupplierController extends Controller
      */
     public function destroy( $id)
     {
-        if(!MdSupplier::find($id)){
+        if(!MdStorage::find($id)){
             return response()->json(["error"=>"Sorry no record Found!"], 200);
         }
-        MdSupplier::where('id',$id)->delete();
-        return response()->json(['message' => 'Supplier Deleted Successfully'],200);
+        MdStorage::where('id',$id)->delete();
+        return response()->json(['message' => 'Storage Deleted Successfully'],200);
     }
 }
