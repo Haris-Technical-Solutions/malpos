@@ -68,6 +68,9 @@ class MdStorageController extends Controller
      */
     public function edit($id)
     {
+        if(!MdStorage::find($id)){
+            return response()->json(["error"=>"Sorry no record Found!"], 200);
+        }
         return response()->json(MdStorage::where('id',$id)->first(),200);
     }
 

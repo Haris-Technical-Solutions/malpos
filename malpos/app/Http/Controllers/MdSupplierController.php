@@ -71,6 +71,9 @@ class MdSupplierController extends Controller
      */
     public function edit($id)
     {
+        if(!MdSupplier::find($id)){
+            return response()->json(["error"=>"Sorry no record Found!"], 200);
+        }
         return response()->json(MdSupplier::where('id',$id)->first(),200);
     }
 

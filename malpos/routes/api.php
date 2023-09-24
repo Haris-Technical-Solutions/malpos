@@ -33,6 +33,7 @@ use App\Http\Controllers\MdCustomerGroupController;
 use App\Http\Controllers\MdStorageController;
 use App\Http\Controllers\MdSupplierController;
 use App\Http\Controllers\MdSupplyController;
+use App\Http\Controllers\MdStockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -203,6 +204,8 @@ Route::post('check_pin', [UserController::class, 'checkPin'])->name('check_pin')
 
 
 Route::resource('cdclients', CdClientController::class);
+
+Route::get('get_stock', [MdStockController::class, 'index']);
 
 Route::get('get_country', [GdCityController::class, 'get_country']);
 Route::get('get_city/{country}', [GdCityController::class, 'get_city']);

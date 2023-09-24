@@ -70,6 +70,9 @@ class MdCustomerGroupController extends Controller
      */
     public function edit($id)
     {
+        if(!MdCustomerGroup::find($id)){
+            return response()->json(["error"=>"Sorry no record Found!"], 200);
+        }
         return response()->json(MdCustomerGroup::where('id',$id)->first(),200);
     }
 
@@ -87,7 +90,7 @@ class MdCustomerGroupController extends Controller
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
-            
+
             "group_name" => ['required',"string", Rule::unique('md_customer_groups')
             ->where("cd_client_id",$request->cd_client_id)
             ->where("cd_brand_id",$request->cd_brand_id)
