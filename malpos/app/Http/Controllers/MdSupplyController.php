@@ -199,8 +199,8 @@ class MdSupplyController extends Controller
             return response()->json(["error"=>"Sorry no record Found!"], 200);
         }
 
-        MdSupply::where("id",$id)->delete();
-        MdSupplyLine::where("md_supply_id",$id)->delete();
+        MdSupply::where("id",$id)->update(["status"=>'deleted']);
+        // MdSupplyLine::where("md_supply_id",$id)->delete();
         return response()->json(['message' => 'Supply Deleted Successfully'],200);
     }
 }
