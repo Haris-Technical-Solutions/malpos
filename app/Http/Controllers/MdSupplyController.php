@@ -23,7 +23,7 @@ class MdSupplyController extends Controller
             // "supply_lines",
             "supply_lines.product:md_product_id,product_name"
         ])
-        ->get(),200);
+        ->simplePaginate(10),200);
     }
 
     /**

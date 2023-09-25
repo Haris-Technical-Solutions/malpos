@@ -14,7 +14,7 @@ class MdSupplierController extends Controller
      */
     public function index()
     {
-        return response()->json(MdSupplier::all(),200);
+        return response()->json(MdSupplier::simplePaginate(10),200);
     }
 
     /**
@@ -121,7 +121,7 @@ class MdSupplierController extends Controller
         if(!MdSupplier::find($id)){
             return response()->json(["error"=>"Sorry no record Found!"], 200);
         }
-        MdSupplier::where('id',$id)->delete();
+        MdSupplier::where('id',$id)->update(["status"=>"deleted"]);
         return response()->json(['message' => 'Supplier Deleted Successfully'],200);
     }
 }

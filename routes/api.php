@@ -206,6 +206,7 @@ Route::post('check_pin', [UserController::class, 'checkPin'])->name('check_pin')
 Route::resource('cdclients', CdClientController::class);
 
 Route::get('get_stock', [MdStockController::class, 'index']);
+Route::get('get_product_stock/{product_id}/{storage_id}', [MdStockController::class, 'product_stock']);
 
 Route::get('get_country', [GdCityController::class, 'get_country']);
 Route::get('get_city/{country}', [GdCityController::class, 'get_city']);

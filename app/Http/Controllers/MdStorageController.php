@@ -14,7 +14,7 @@ class MdStorageController extends Controller
      */
     public function index()
     {
-        return response()->json(MdStorage::all(),200);
+        return response()->json(MdStorage::simplePaginate(10),200);
     }
 
     /**
