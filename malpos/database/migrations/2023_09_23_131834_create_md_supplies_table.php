@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp("operation_time");
             $table->foreignId('md_supplier_id')->on('md_suppliers');
             $table->foreignId('md_storage_id')->on('md_storages');
-            $table->enum('status',["approved","draft"]);
+            $table->enum('status',["approved","draft","deleted"]);
 
             $table->string('balance')->nullable();
             $table->string('category')->nullable();
