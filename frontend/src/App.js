@@ -92,6 +92,7 @@ import StorageCreate from "./pages/master/StorageCreate";
 import StorageDetails from "./pages/master/StorageDetails";
 import Suppliers from "./pages/master/Suppliers";
 import SuppliersCreate from "./pages/master/SuppliersCreate";
+
 import Production from "./pages/master/Production";
 import ProductionDetails from "./pages/master/ProductionDetails";
 
@@ -99,6 +100,8 @@ import StockDetails from "./pages/master/StockDetails";
 import StockDetailsSupplies from "./pages/master/StockDetailsSupplies";
 import SuppliesCreate from "./pages/master/SuppliesCreate";
 import ReturnSuppliesCreate from "./pages/master/ReturnSuppliesCreate";
+import SuppliesEdit from "./pages/master/SuppliesEdit";
+
 import TransferDetails from "./pages/master/TransferDetails";
 import TransferCreate from "./pages/master/TransferCreate";
 import ButtonComponent from "./pages/master/InventoryCreate";
@@ -165,6 +168,7 @@ import CreateMenuSection from "./newPages/MenuSections/CreateMenuSection";
 import CreateModifer from "./pages/form/CreateModifer";
 
 import { ProductProvider } from "./components/createProduct/productContext";
+import SuppliersEdit from "./pages/master/SuppliersEdit";
 
 export default function App() {
   return (
@@ -488,7 +492,7 @@ export default function App() {
                   element={<StockDetailsSupplies />}
                 />
                 <Route path="/supplies-create" element={<SuppliesCreate />} />
-
+                <Route path="/supplies-edit" element={<SuppliesEdit />} />
                 <Route path="/movement-reports" element={<MovementReport />} />
                 <Route path="/product-movement" element={<ProductMovement />} />
 
@@ -544,6 +548,7 @@ export default function App() {
                 <Route path="/storage-details" element={<StorageDetails />} />
                 <Route path="/suppliers" element={<Suppliers />} />
                 <Route path="/suppliers-create" element={<SuppliersCreate />} />
+                <Route path="/suppliers-edit" element={<SuppliersEdit />} />
                 {/* Alert  /suppliers-create and /suppliers-edit having same design  */}
                 <Route path="/production" element={<Production />} />
                 <Route
@@ -600,6 +605,7 @@ export default function App() {
                 <Route path="/storage-details" element={<StorageDetails />} />
                 <Route path="/suppliers" element={<Suppliers />} />
                 <Route path="/suppliers-create" element={<SuppliersCreate />} />
+                <Route path="/suppliers-edit" element={<SuppliersEdit />} />
                 <Route
                   path="/suppliers-details"
                   element={<SuppliersDetails />}

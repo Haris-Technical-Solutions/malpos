@@ -9,6 +9,8 @@ export const ProductProvider = ({ children }) => {
   const [ingredients, setIngredients] = useState([
     { ingredient: null, type: null, gross: null, price: null },
   ]);
+
+  const [storage, setStorage] = useState([]);
   const [clients, setClients] = useState([]);
   const [brands, setBrands] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -123,6 +125,18 @@ export const ProductProvider = ({ children }) => {
       const res = await axiosInstance.get("/cdclient");
       const formattedData = formatData(res.data, "cd_client_id");
       setClients(formattedData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchStorage = async () => {
+    
+    try {
+      const res = await axiosInstance.get("/md_storage");
+      console.log(res, "storageStorageishere");
+      // const formattedData = formatData(res.data, "cd_client_id");
+      setStorage(res.data);
     } catch (error) {
       console.log(error);
     }
@@ -661,6 +675,7 @@ export const ProductProvider = ({ children }) => {
   // Use useEffect to fetch data when component mounts
   useEffect(() => {
     fetchClients();
+    fetchStorage();
     fetchBrands();
     fetchBranches();
     fetchCategories();
@@ -691,6 +706,7 @@ export const ProductProvider = ({ children }) => {
       value={{
         // State
         clients,
+        storage,
         brands,
         branches,
         categories,
@@ -734,6 +750,7 @@ export const ProductProvider = ({ children }) => {
         setDeletingMethod,
         setIsLoading,
         setForm,
+        setStorage,
 
         // Handlers
         handleClientChange,

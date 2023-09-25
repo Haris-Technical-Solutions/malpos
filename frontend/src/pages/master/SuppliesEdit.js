@@ -13,7 +13,7 @@ import MultiSelectNoLabel from '../../components/fields/MultiSelectNoLabel'
 import PageLayout from '../../layouts/PageLayout'
 import axiosInstance from '../../api/baseUrl'; // Replace with the actual path
 
-export default function SuppliesCreate() {
+export default function SuppliesEdit() {
     const [isChecked, setIsChecked] = useState(false);
     const [AddOpen, setAddClose] = useState(false)
     const [showIng, setShowIng] = useState(false);
@@ -46,7 +46,7 @@ export default function SuppliesCreate() {
     };
     return (
         <div>
-            <PageLayout>
+            {/* <PageLayout>
                 <Row>
                     <Col md={12}>
                         <CardLayout>
@@ -462,7 +462,7 @@ export default function SuppliesCreate() {
                         </CardLayout>
                     </Col>
                 </Row>
-            </PageLayout>
+            </PageLayout> */}
         </div>
     )
 }

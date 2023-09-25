@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row, Form, Button } from "react-bootstrap";
 import { CardLayout } from "../../components/cards";
 import { Box } from "../../components/elements";
 import { LabelField } from "../../components/fields";
 import PageLayout from "../../layouts/PageLayout";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axiosInstance from "../../api/baseUrl";
 import { toast } from "react-toastify";
 import { useProduct } from "../../components/createProduct/productContext"; // Import the context
 
-export default function SuppliersCreate() {
+export default function SuppliersEdit() {
+  const location = useLocation();
   const { form } = useProduct(); // Retrieve the context
 
+  const [editSupplierId, setEditSupplierId] = useState();
+  const [action, setAction] = useState();
   const [currentSupplier, setCurrentSupplier] = useState({
     supplier_name: "",
     phone: "",
@@ -30,31 +33,51 @@ export default function SuppliersCreate() {
     }));
   };
 
-  const handleCreateSupplier = () => {
+  const handleUpdateSupplier = () => {
     axiosInstance
-      .post("/md_supplier", currentSupplier)
+      .post(`/md_supplier/update/${editSupplierId}`, currentSupplier)
       .then((response) => {
-        toast.success("Supplier created successfully", {
+        toast.success("Supplier updated successfully", {
           position: "top-right",
           autoClose: 3000,
         });
-        console.log("Supplier created successfully", response.data);
+        console.log("Supplier updated successfully", response.data);
       })
       .catch((error) => {
-        toast.error("Error creating supplier", {
+        toast.error("Error updating supplier", {
           position: "top-right",
           autoClose: 3000,
         });
-        console.error("Error creating supplier", error);
+        console.error("Error updating supplier", error);
       });
   };
+
+  useEffect(() => {
+    if (location.state?.id) {
+      setEditSupplierId(location.state.id);
+      setAction(location.state.action);
+
+      const fetchSupplierById = async (id) => {
+        try {
+          const res = await axiosInstance.get(`/md_supplier/${id}/edit`);
+          setCurrentSupplier(res.data);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      fetchSupplierById(location.state.id);
+    }
+  }, [location.state]);
 
   return (
     <div>
       <PageLayout>
         <Row>
           <Col md={12}>
-            <CardLayout>Create Supplier</CardLayout>
+            <CardLayout>
+              {action === "create" ? "Create Supplier" : "Edit Supplier"}
+            </CardLayout>
           </Col>
           <Col md={12}>
             <CardLayout>
@@ -114,9 +137,15 @@ export default function SuppliersCreate() {
                       onChange={handleSwitchChange}
                     />
                   </Box>
-                  <Button variant="primary" onClick={handleCreateSupplier}>
-                    Create
-                  </Button>
+                  {action === "create" ? (
+                    <Button variant="primary" onClick={handleUpdateSupplier}>
+                      Create
+                    </Button>
+                  ) : (
+                    <Button variant="primary" onClick={handleUpdateSupplier}>
+                      Update
+                    </Button>
+                  )}
                 </Col>
               </Row>
             </CardLayout>
