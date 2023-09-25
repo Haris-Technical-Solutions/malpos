@@ -23,9 +23,9 @@ class MdStockController extends Controller
         // ->groupBy("unit")
         // ->groupBy("qty")
         // ->groupBy("cost")
-
+        ->where("is_deleted",0)
         // ->groupBy("id")
-        ->selectRaw("sum(cost) as total_cost,md_product_id,cd_brand_id,cd_branch_id,cd_client_id,md_storage_id")
+        ->selectRaw("sum(cost) as total_cost,sum(qty) as total_qty,md_product_id,cd_brand_id,cd_branch_id,cd_client_id,md_storage_id")
         ->with([
             "storage:id,name,is_active",
             "product:md_product_id,product_name"
@@ -36,7 +36,7 @@ class MdStockController extends Controller
     }
     
     public function product_stock($product_id,$storage_id){
-        dd(auth()->user());
+        // dd(auth()->user());// work on it
         $data = MdStock::groupBy("cd_client_id")
         ->where("md_product_id",$product_id)
 
@@ -48,8 +48,9 @@ class MdStockController extends Controller
         ->groupBy("cd_brand_id")
         ->groupBy("cd_branch_id")
         ->groupBy("md_product_id")
+        ->where("is_deleted",0)
         ->groupBy("md_storage_id")
-        ->selectRaw("sum(cost) as total_cost,md_product_id,cd_brand_id,cd_branch_id,cd_client_id,md_storage_id")
+        ->selectRaw("sum(qty) as total_qty,md_product_id,cd_brand_id,cd_branch_id,cd_client_id,md_storage_id")
         ->with([
             "storage:id,name,is_active",
             "product:md_product_id,product_name"

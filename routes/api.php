@@ -1,43 +1,46 @@
 <?php
 
-use App\Http\Controllers\CdBranchController;
-use App\Http\Controllers\CdBrandController;
-use App\Http\Controllers\CdClientController;
-// use App\Http\Controllers\CdClientGroupController;
-use App\Http\Controllers\CdRoleController;
-use App\Http\Controllers\CdUserController;
-use App\Http\Controllers\GdCountryController;
-use App\Http\Controllers\GdRegionController;
-use App\Http\Controllers\KdsController;
-use App\Http\Controllers\MdAllergyController;
-use App\Http\Controllers\MdBankAccountController;
-use App\Http\Controllers\MdBankController;
-use App\Http\Controllers\MdDietController;
-use App\Http\Controllers\MdIngredientCategoryController;
-use App\Http\Controllers\MdIngredientController;
-use App\Http\Controllers\MdMenuController;
-use App\Http\Controllers\MdMenuSectionController;
-use App\Http\Controllers\MdPreparationController;
-use App\Http\Controllers\MdProductCategoryController;
-use App\Http\Controllers\MdProductController;
-use App\Http\Controllers\MdStationController;
-use App\Http\Controllers\TdCurrencyController;
-use App\Http\Controllers\TdSaleOrderController;
-use App\Http\Controllers\TdTaxCategoryController;
-use App\Http\Controllers\TdTaxRateController;
-use App\Http\Controllers\MdModifierController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\GdCityController;
-use App\Http\Controllers\MdCustomerController;
-use App\Http\Controllers\MdCustomerGroupController;
-use App\Http\Controllers\MdStorageController;
-use App\Http\Controllers\MdSupplierController;
-use App\Http\Controllers\MdSupplyController;
-use App\Http\Controllers\MdStockController;
+// use App\Http\Controllers\CdBranchController;
+// use App\Http\Controllers\CdBrandController;
+// use App\Http\Controllers\CdClientController;
+// // use App\Http\Controllers\CdClientGroupController;
+// use App\Http\Controllers\CdRoleController;
+// use App\Http\Controllers\CdUserController;
+// use App\Http\Controllers\GdCountryController;
+// use App\Http\Controllers\GdRegionController;
+// use App\Http\Controllers\KdsController;
+// use App\Http\Controllers\MdAllergyController;
+// use App\Http\Controllers\MdBankAccountController;
+// use App\Http\Controllers\MdBankController;
+// use App\Http\Controllers\MdDietController;
+// use App\Http\Controllers\MdIngredientCategoryController;
+// use App\Http\Controllers\MdIngredientController;
+// use App\Http\Controllers\MdMenuController;
+// use App\Http\Controllers\MdMenuSectionController;
+// use App\Http\Controllers\MdPreparationController;
+// use App\Http\Controllers\MdProductCategoryController;
+// use App\Http\Controllers\MdProductController;
+// use App\Http\Controllers\MdStationController;
+// use App\Http\Controllers\TdCurrencyController;
+// use App\Http\Controllers\TdSaleOrderController;
+// use App\Http\Controllers\TdTaxCategoryController;
+// use App\Http\Controllers\TdTaxRateController;
+// use App\Http\Controllers\MdModifierController;
+// use App\Http\Controllers\UserController;
+// use App\Http\Controllers\GdCityController;
+// use App\Http\Controllers\MdCustomerController;
+// use App\Http\Controllers\MdCustomerGroupController;
+// use App\Http\Controllers\MdStorageController;
+// use App\Http\Controllers\MdSupplierController;
+// use App\Http\Controllers\MdSupplyController;
+// use App\Http\Controllers\MdStockController;
+// use App\Http\Controllers\MdStockTransferController;
+namespace App\Http\Controllers;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
+// use namespace ;
 
 
 
@@ -231,6 +234,9 @@ Route::post("md_supplier/update/{id}",[MdSupplierController::class,"update"]);
 
 Route::resource("md_supplies",MdSupplyController::class);
 Route::post("md_supplies/update/{id}",[MdSupplyController::class,"update"]);
+
+Route::resource("md_stock_transfer",MdStockTransferController::class);
+Route::post("md_stock_transfer/update/{id}",[MdStockTransferController::class,"update"]);
 
 Route::get('cduser', [CdUserController::class, 'index'])->name('cduser');
 Route::post('cduser_store', [CdUserController::class, 'store'])->name('cduser_store');

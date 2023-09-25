@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
-use App\Models\MdStock;
-use App\Models\MdSupply;
-use App\Models\MdSupplyLine;
 
-class MdSupplyController extends Controller
+use Illuminate\Support\Facades\Validator;
+use App\Models\MdStock;
+use App\Models\MdStockTransfer;
+use App\Models\MdStockTransferLine;
+use App\Models\MdStockTransferLine;
+use Illuminate\Validation\Rule;
+
+class MdStockTransferController extends Controller
 {
      /**
      * Display a listing of the resource.
@@ -45,14 +47,11 @@ class MdSupplyController extends Controller
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
 
-            "invoice_no" => ['nullable',"string",Rule::unique('md_supplies')],
             "operation_time" => ['required',"string"],
-            "md_supplier_id" => ['required',"numeric"],
-            "md_storage_id" => ['required',"numeric"],
-            "status" => ['required',"string"],
-            "balance" => ['nullable',"string"],
-            "category" => ['nullable',"string"],
-            "description" => ['nullable',"string"],
+            "md_from_storage_id" => ['required',"numeric"],
+            "md_to_storage_id" => ['required',"numeric"],
+
+            "reason" => ['nullable',"string"],
 
             "created_by" => ['nullable',"string"],
             "updated_by" => ['nullable',"string"],
@@ -60,11 +59,7 @@ class MdSupplyController extends Controller
             // "lines.*.md_supply_id" => ['required',"numeric"],
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
-            "lines.*.total" => ['required',"numeric"],
             "lines.*.unit" => ['nullable',"string"],
-            "lines.*.cost" => ['required',"numeric"],
-            "lines.*.discount_percent" => ['nullable',"numeric"],
-            "lines.*.tax_percent" => ['nullable',"numeric"],
         ]);
 
         if ($validator->fails()) {
@@ -74,36 +69,47 @@ class MdSupplyController extends Controller
         // $data = array_filter($data, function ($value) {
         //     return $value !== null;
         // });
-        if(!$data["invoice_no"]){
-            $old = MdSupply::max("invoice_no");
-            $data["invoice_no"] = "1";
-            if($old){
-                $data["invoice_no"] = intval($old);
-                $data["invoice_no"]++;
-                $data["invoice_no"] = strval($data["invoice_no"]);
-            }
-        }
         // dd($data);
         $lines = $data["lines"];
         unset($data["lines"]);
-        $supply = MdSupply::create($data);
+        // dd($data,$lines);
+        $transfer = MdStockTransfer::create($data);
         foreach($lines as $line){
             MdStock::create([
                 "cd_client_id" =>  $request->cd_client_id,
                 "cd_brand_id" =>  $request->cd_brand_id,
                 "cd_branch_id" =>  $request->cd_branch_id,
 
-                "md_supply_id" => $supply->id,
-                "md_storage_id" => $request->md_storage_id,
+                "md_stock_transfer_id" => $transfer->id,
                 "md_product_id" => $line["md_product_id"],
-                "stock_type" => "supply",
-                "qty" => $line["qty"],
-                "cost" => $line["cost"],
+                "md_storage_id" => $request->md_from_storage_id,
+                "stock_type" => "transfer",
+                "qty" => ($line["qty"]*-1),
+                "unit" => $line["unit"],
+                // "cost" => $line["cost"],
             ]);
-            $line["md_supply_id"] = $supply->id;
-            MdSupplyLine::create($line);
+            MdStock::create([
+                "cd_client_id" =>  $request->cd_client_id,
+                "cd_brand_id" =>  $request->cd_brand_id,
+                "cd_branch_id" =>  $request->cd_branch_id,
+
+                "md_stock_transfer_id" => $transfer->id,
+                "md_product_id" => $line["md_product_id"],
+                "md_storage_id" => $request->md_to_storage_id,
+                "stock_type" => "transfer",
+                "qty" => ($line["qty"]),
+                "unit" => $line["unit"],
+                // "cost" => $line["cost"],
+            ]);
+            // MdStockTransferLine::create([
+            //     "md_product_id" => $line["md_product_id"],
+            //     "qty" => $line["qty"],
+            //     "unit" => $line["unit"],
+            //     // "cost" => $line["cost"],
+            // ]);
+            // MdSupplyLine::create($line);
         }
-        return response()->json(['message' => 'Supply Created Successfully',"data"=>MdSupply::getSupply($supply->id)],200);
+        return response()->json(['message' => 'Stock Transferd Successfully',"data"=>""],200);
     }
 
     /**
@@ -200,7 +206,6 @@ class MdSupplyController extends Controller
         }
 
         MdSupply::where("id",$id)->update(["status"=>'deleted']);
-        MdStock::where("md_supply_id",$id)->update(["is_deleted"=>true]);
         // MdSupplyLine::where("md_supply_id",$id)->delete();
         return response()->json(['message' => 'Supply Deleted Successfully'],200);
     }
