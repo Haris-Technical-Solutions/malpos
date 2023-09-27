@@ -123,8 +123,8 @@ class MdProductController extends Controller
 
         MdProductUnit::create([
             "cd_client_id"=> $request->input('cd_client_id'),
-            "cd_brand_id"=> $request->input('cd_brand_id'),
-            "cd_branch_id"=> $request->input('cd_branch_id'),
+            // "cd_brand_id"=> $request->input('cd_brand_id'),
+            // "cd_branch_id"=> $request->input('cd_branch_id'),
             "md_product_id"=> $latestMdProductId,
             "md_uom_id"=>  $request->input('md_uom_id'),
             "is_active" => 1,
@@ -215,6 +215,7 @@ class MdProductController extends Controller
 
         $data = MdProduct::with([
             'client',
+            "base_unit.conversion",
             'product_branch.branch',
             'product_brand.brand',
             'product_product_category.product_category',
@@ -323,8 +324,8 @@ class MdProductController extends Controller
         MdProductUnit::where("md_product_id", $id)->delete();
         MdProductUnit::create([
             "cd_client_id"=> $request->input('cd_client_id'),
-            "cd_brand_id"=> $request->input('cd_brand_id'),
-            "cd_branch_id"=> $request->input('cd_branch_id'),
+            // "cd_brand_id"=> $request->input('cd_brand_id'),
+            // "cd_branch_id"=> $request->input('cd_branch_id'),
             "md_product_id"=> $id,
             "md_uom_id"=>  $request->input('md_uom_id'),
             "is_active" => 1,
@@ -402,6 +403,7 @@ class MdProductController extends Controller
         // return response()->json(['data'=>$data]);
 
         $data = MdProduct::with([
+            "base_unit.conversion",
             'client',
             'product_branch.branch',
             'product_brand.brand',
