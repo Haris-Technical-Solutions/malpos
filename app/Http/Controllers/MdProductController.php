@@ -12,6 +12,7 @@ use App\Models\MdProductDiet;
 use App\Models\MdProductModifier;
 use App\Models\MdProductProductCategory;
 use Illuminate\Http\Request;
+use App\Models\MdProductUnit;
 
 class MdProductController extends Controller
 {
@@ -41,6 +42,7 @@ class MdProductController extends Controller
 
     $query = MdProduct::with([
         'client',
+        "base_unit.conversion",
         'product_branch.branch',
         'product_brand.brand',
         'product_product_category.product_category',
@@ -117,8 +119,17 @@ class MdProductController extends Controller
             $data->product_image = $profileImage;
         }
         $data->save();
-
         $latestMdProductId = MdProduct::max('md_product_id');
+
+        MdProductUnit::create([
+            "cd_client_id"=> $request->input('cd_client_id'),
+            "cd_brand_id"=> $request->input('cd_brand_id'),
+            "cd_branch_id"=> $request->input('cd_branch_id'),
+            "md_product_id"=> $latestMdProductId,
+            "md_uom_id"=>  $request->input('md_uom_id'),
+            "is_active" => 1
+        ]);
+
 
         $product_detail = $request->input('product_detail');
         $product_modifiers = $request->input('product_modifiers');
@@ -228,7 +239,9 @@ class MdProductController extends Controller
     public function edit( $id)
     {
         //
+        // return 1;
         $data = MdProduct::with([
+            "base_unit.conversion",
             'product_brand',
             'product_branch',
             'product_product_category',
@@ -304,6 +317,15 @@ class MdProductController extends Controller
         $product_diets_delete = MdProductDiet::where('md_product_id', $id)->delete();
 
 
+        MdProductUnit::where("md_product_id", $id)->delete();
+        MdProductUnit::create([
+            "cd_client_id"=> $request->input('cd_client_id'),
+            "cd_brand_id"=> $request->input('cd_brand_id'),
+            "cd_branch_id"=> $request->input('cd_branch_id'),
+            "md_product_id"=> $id,
+            "md_uom_id"=>  $request->input('md_uom_id'),
+            "is_active" => 1
+        ]);
 
         if ($product_detail) {
             foreach($product_detail as $item){

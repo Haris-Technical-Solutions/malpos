@@ -9,4 +9,5 @@ class MdUom extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    
 }
