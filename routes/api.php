@@ -224,6 +224,13 @@ Route::resource("md_customer",MdCustomerController::class);
 Route::resource("md_customer_group",MdCustomerGroupController::class);
 
 Route::post('md_customer/update/{id}', [MdCustomerController::class, 'update'])->name('md_customer_update');
+
+Route::resource('uom', MdUOMController::class);
+Route::post("uom/update/{id}",[MdUOMController::class,"update"]);
+
+Route::resource('uom_conversion', MdUOMConversionController::class);
+Route::post("uom_conversion/update/{id}",[MdUOMConversionController::class,"update"]);
+
 Route::post("md_customer_group/update/{id}",[MdCustomerGroupController::class,"update"]);
 
 Route::resource("md_storage",MdStorageController::class);

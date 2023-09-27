@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MdSupplyLine extends Model
+class MdSuppliesLine extends Model
 {
     use HasFactory;
     protected $guarded = [];

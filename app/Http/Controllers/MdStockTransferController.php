@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\MdStock;
 use App\Models\MdStockTransfer;
 use App\Models\MdStockTransferLine;
-use App\Models\MdStockTransferLine;
+// use App\Models\MdStockTransferLine;
 use Illuminate\Validation\Rule;
 
 class MdStockTransferController extends Controller

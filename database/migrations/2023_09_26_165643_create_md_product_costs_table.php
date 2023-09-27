@@ -11,16 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('md_supply_lines', function (Blueprint $table) {
+        Schema::create('md_product_costs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('md_supply_id')->on('md_supplies');
+            $table->foreignId('cd_client_id')->on('cd_clients');
+            $table->foreignId('cd_brand_id')->on('cd_brands')->nullable();
+            $table->foreignId('cd_branch_id')->on('cd_branchs')->nullable();
+
             $table->foreignId('md_product_id')->on('md_products');
-            $table->double("qty");
-            $table->string("unit")->nullable();
-            $table->double("cost");
-            $table->double("discount_percent")->nullable();
-            $table->double("tax_percent")->nullable();
-            $table->double("total");
+            $table->double("current_cost");
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('md_supply_lines');
+        Schema::dropIfExists('md_product_costs');
     }
 };
