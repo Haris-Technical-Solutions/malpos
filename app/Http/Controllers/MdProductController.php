@@ -127,7 +127,10 @@ class MdProductController extends Controller
             "cd_branch_id"=> $request->input('cd_branch_id'),
             "md_product_id"=> $latestMdProductId,
             "md_uom_id"=>  $request->input('md_uom_id'),
-            "is_active" => 1
+            "is_active" => 1,
+            
+            "created_by" => $request->input('created_by'),
+            "updated_by" => $request->input('updated_by'),
         ]);
 
 
@@ -286,7 +289,7 @@ class MdProductController extends Controller
         // $data->cd_brand_id = $request->input('cd_brand_id');
         // $data->cd_branch_id = $request->input('cd_branch_id');
         $data->is_active = $request->input('is_active', '1');
-        $data->created_by = $request->input('updated_by');
+        $data->created_by = $request->input('created_by');
         $data->updated_by = $request->input('updated_by');
 
         if ($image = $request->file('product_image')) {
@@ -324,7 +327,9 @@ class MdProductController extends Controller
             "cd_branch_id"=> $request->input('cd_branch_id'),
             "md_product_id"=> $id,
             "md_uom_id"=>  $request->input('md_uom_id'),
-            "is_active" => 1
+            "is_active" => 1,
+            "created_by" => $request->input('created_by'),
+            "updated_by" => $request->input('updated_by'),
         ]);
 
         if ($product_detail) {
