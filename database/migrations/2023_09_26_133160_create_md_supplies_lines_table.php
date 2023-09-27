@@ -24,6 +24,7 @@ return new class extends Migration
             $table->double("discount_percent")->nullable();
             $table->double("tax")->nullable();
             $table->double("total");
+            $table->boolean("is_deleted")->default(0);
             $table->timestamps();
         });
     }
