@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('md_supply_id')->on('md_supplies');
             $table->foreignId('md_product_id')->on('md_products');
-            $table->foreignId('md_product_unit_id')->on('md_product_units');
+            $table->bigInteger('uom_id');
+            $table->string("uom_type")->default("base_unit")->nullable();
             $table->double("qty");
             // $table->string("unit")->nullable();
             $table->double("cost");

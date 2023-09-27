@@ -64,8 +64,8 @@ class KdsController extends Controller
 
             if($filter != null){
                 $data_qry->whereHas('td_sale_order_item', function ($query) use ($filter) {
-                $query->where('order_item_status', $filter);
-            });       
+                    $query->where('order_item_status', $filter);
+                });       
             }
 
             $data = $data_qry->whereHas('td_sale_order_item.md_product.station_product', function ($query) use ($station_id) {

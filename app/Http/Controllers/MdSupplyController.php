@@ -11,6 +11,7 @@ use App\Models\MdProduct;
 use App\Models\MdSuppliesLine;
 use App\Models\MdProductCost;
 use App\Models\MdProductUnit;
+use App\Models\MdUomsConversion;
 
 class MdSupplyController extends Controller
 {
@@ -63,7 +64,8 @@ class MdSupplyController extends Controller
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
             "lines.*.total" => ['required',"numeric"],
-            "lines.*.md_product_unit_id" => ['required',"numeric"],
+            "lines.*.uom_id" => ['required',"numeric"],
+            "lines.*.uom_type" => ['required',"string"],
             "lines.*.cost" => ['required',"numeric"],
             "lines.*.discount_percent" => ['nullable',"numeric"],
             "lines.*.tax" => ['nullable',"numeric"],
@@ -97,11 +99,18 @@ class MdSupplyController extends Controller
                 // do it later, delete created
             }
             $qty = $line["qty"];
-            if($product_base_unit->id != $line["md_product_unit_id"]){
-                $unit = MdProductUnit::where("id",$line["md_product_unit_id"])->select("md_uom_conversion_id")
-                ->with("conversion:md_uoms_conversions_id,multiply_rate,divide_rate")->first();
-                $qty*=$unit->conversion["multiply_rate"];
+
+            if($line["uom_type"] == "conversion"){
+                $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
+                $qty*=$unit->multiply_rate;
             }
+
+            // if($product_base_unit->id != $line["md_product_unit_id"]){
+            //     $unit = MdProductUnit::where("id",$line["md_product_unit_id"])->select("md_uom_conversion_id")
+            //     ->with("conversion:md_uoms_conversions_id,multiply_rate,divide_rate")->first();
+            //     $qty*=$unit->conversion["multiply_rate"];
+            // }
+
             // add line_amount and total in table lines
             // -------------------oldcost---------------------------
             // $oldcost = MdSuppliesLine::where("md_product_id",$line["md_product_id"])
@@ -227,7 +236,9 @@ class MdSupplyController extends Controller
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
             "lines.*.total" => ['required',"numeric"],
-            "lines.*.md_product_unit_id" => ['required',"numeric"],
+            // "lines.*.md_product_unit_id" => ['required',"numeric"],
+            "lines.*.uom_id" => ['required',"numeric"],
+            "lines.*.uom_type" => ['required',"string"],
             "lines.*.cost" => ['required',"numeric"],
             "lines.*.discount_percent" => ['nullable',"numeric"],
             "lines.*.tax" => ['nullable',"numeric"],
@@ -307,11 +318,15 @@ class MdSupplyController extends Controller
                 // do it later, delete created
             }
             $qty = $line["qty"];
-            if($product_base_unit->id != $line["md_product_unit_id"]){
-                $unit = MdProductUnit::where("id",$line["md_product_unit_id"])->select("md_uom_conversion_id")
-                ->with("conversion:md_uoms_conversions_id,multiply_rate,divide_rate")->first();
-                $qty*=$unit->conversion["multiply_rate"];
+            if($line["uom_type"] == "conversion"){
+                $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
+                $qty*=$unit->multiply_rate;
             }
+            // if($product_base_unit->id != $line["md_product_unit_id"]){
+            //     $unit = MdProductUnit::where("id",$line["md_product_unit_id"])->select("md_uom_conversion_id")
+            //     ->with("conversion:md_uoms_conversions_id,multiply_rate,divide_rate")->first();
+            //     $qty*=$unit->conversion["multiply_rate"];
+            // }
             // --------------------------stock-----------------------------------
             $stock = MdStock::where('md_product_id',$line["md_product_id"])
             ->where("cd_client_id", $request->cd_client_id)
