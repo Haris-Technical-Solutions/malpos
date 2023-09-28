@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\MdUom;
+use App\Models\MdUomsConversion;
+use App\Models\MdProductUnit;
 
 class MdUOMController extends Controller
 {
@@ -16,6 +18,37 @@ class MdUOMController extends Controller
     {
         $data = MdUom::paginate(10);
         return response()->json(["data"=>$data],200);
+    }
+    
+    public function get_units_by_product($product_id)
+    {
+        $units = [];
+        $pu = MdProductUnit::where("md_product_id",$product_id)->where("is_deleted",0)->first();
+        $base_unit = MdUom::where("md_uoms_id",$pu->md_uom_id)->where("is_active",1)
+        ->with(["conversions"=> function ($query) {
+            $query->select("md_uom_id","md_uoms_conversions_id","uom_to_name as name","multiply_rate","divide_rate");
+        }])->whereHas('conversions', function ($query) {
+            return $query->where('is_active', 1);
+        })
+        ->select(["md_uoms_id","name"])
+        ->first();
+
+        // $conversions = MdUomsConversion::where("md_uom_id",$base_unit->md_uoms_id)->where("is_active",1)->get();
+        if($base_unit){
+            // array_push($units,["uom_id"=>$base_unit->md_uoms_id,"uom_type"=>"base_unit","name"=>$base_unit->name,"multiply_rate"=>1,"divide_rate"=>1]);
+            // foreach($conversions as $conversion){
+            //     array_push($units,[
+            //         "uom_id"=>$conversion->md_uoms_conversions_id ,
+            //         "uom_type"=>"conversion",
+            //         "name"=>$conversion->uom_to_name,
+            //         "multiply_rate"=>$conversion->multiply_rate,
+            //         "divide_rate"=>$conversion->divide_rate,
+            //     ]);
+            // }
+            return response()->json(["data"=>$base_unit],200);
+        }else{
+            return response()->json(['error' => ["Sorry no base unit found for this product"]], 401);
+        }
     }
 
     /**
@@ -111,9 +144,14 @@ class MdUOMController extends Controller
      */
     public function destroy($id)
     {
+        $data = MdUom::where("md_uoms_id",$id)->first();
         if(!MdUom::where("md_uoms_id",$id)->first()){
             return response()->json(['error' => 'Sorry no record Found!'],200);
         }
+        if(MdUomsConversion::where("cd_client_id",$data->cd_client_id)->where("is_active",1)->where("md_uoms_id",$id)->first()){
+            return response()->json(['message' => 'UOM Cannot be Deleted, Because it is associated to uom conversion'],200);
+        }
+
         MdUom::where("md_uoms_id",$id)->update(["is_active" => 0]);
         return response()->json(['message' => 'UOM Deleted Successfully'],200);
     }
