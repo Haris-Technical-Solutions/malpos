@@ -41,6 +41,9 @@ class MdProduct extends Model
     public function product_modifier(){
         return $this->hasMany(MdProductModifier::class, 'md_product_id');
     }
+    public function stations(){
+        return $this->hasOne(MdStationProduct::class, 'md_product_id');
+    }
 
     public function station_product(){
         return $this->hasMany(MdStationProduct::class, 'md_product_id');

@@ -52,27 +52,31 @@ class KdsController extends Controller
      */
 
 
-     public function show_kds(Request $request){
+    public function show_kds(Request $request){
         $station_id = $request->md_station_id;
         $filter = $request->filter;
         
-        // $data = TdSaleOrder::with('td_sale_order_item.md_product.station_product')->get();
+        // $data = TdSaleOrder::with('td_sale_order_item','td_sale_order_item.md_product.station_product')->get();
         // return response($data);
 
 
-            $data_qry = TdSaleOrder::with(['td_sale_order_item', 'td_sale_order_item.md_product']);
+            $data_qry = TdSaleOrder::with(['td_sale_order_item', 'td_sale_order_item.md_product.stations.station']);
 
             if($filter != null){
                 $data_qry->whereHas('td_sale_order_item', function ($query) use ($filter) {
                     $query->where('order_item_status', $filter);
                 });       
             }
+            if($station_id){
+                $data_qry->whereHas('td_sale_order_item.md_product.stations.station', function ($query) use ($station_id) {
+                    $query->where('md_station_id', $station_id);
+                });
+            }
 
-            $data = $data_qry->whereHas('td_sale_order_item.md_product.station_product', function ($query) use ($station_id) {
-                $query->where('md_station_id', $station_id);
-            })->get();
+            $data = $data_qry->get();
+
             return response()->json($data);
-        }
+    }
 
 
     public function edit(Kds $kds)
