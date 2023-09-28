@@ -10,47 +10,13 @@ use App\Models\MdStock;
 class MdStockController extends Controller
 {
     public function index(){
-        $data = MdStock::groupBy("cd_client_id")
-        ->groupBy("cd_brand_id")
-        ->groupBy("cd_branch_id")
-        ->groupBy("md_product_id")
-        ->groupBy("md_storage_id")
-
-        // ->groupBy("md_supply_id")
-        // ->groupBy("stock_type")
-        // ->groupBy("type")
-        // ->groupBy("category")
-        // ->groupBy("unit")
-        // ->groupBy("qty")
-        // ->groupBy("cost")
-        ->where("is_deleted",0)
-        // ->groupBy("id")
-        ->selectRaw("sum(cost) as total_cost,sum(qty) as total_qty,md_product_id,cd_brand_id,cd_branch_id,cd_client_id,md_storage_id")
-        ->with([
-            "storage:id,name,is_active",
-            "product:md_product_id,product_name"
-        ])
-        ->simplePaginate(10);
-        // ->get();
+        $data = MdStock::simplePaginate(10);
         return response()->json($data, 200);
     }
     
     public function product_stock($product_id,$storage_id){
         // dd(auth()->user());// work on it
-        $data = MdStock::groupBy("cd_client_id")
-        ->where("md_product_id",$product_id)
-
-        // ->where("cd_brand_id",$id)
-        // ->where("cd_branch_id",$id)
-        // ->where("md_product_id",$id)
-        ->where("md_storage_id",$storage_id)
-
-        ->groupBy("cd_brand_id")
-        ->groupBy("cd_branch_id")
-        ->groupBy("md_product_id")
-        ->where("is_deleted",0)
-        ->groupBy("md_storage_id")
-        ->selectRaw("sum(qty) as total_qty,md_product_id,cd_brand_id,cd_branch_id,cd_client_id,md_storage_id")
+        $data = MdStock::where("md_product_id",$product_id)
         ->with([
             "storage:id,name,is_active",
             "product:md_product_id,product_name"

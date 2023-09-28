@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('md_stock_transfer_id')->on('md_stock_transfers');
             $table->foreignId('md_product_id')->on('md_products');
+            $table->bigInteger('uom_id');
+            $table->enum("uom_type",["base_unit","conversion"])->default("base_unit");
             $table->double("qty");
-            $table->string("unit")->nullable();
             $table->timestamps();
         });
     }

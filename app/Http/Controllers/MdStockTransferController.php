@@ -59,56 +59,84 @@ class MdStockTransferController extends Controller
             // "lines.*.md_supply_id" => ['required',"numeric"],
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
-            "lines.*.unit" => ['nullable',"string"],
+            "lines.*.uom_id" => ['required',"string"],
+            "lines.*.uom_type" => ['required',"string"],
         ]);
 
         if ($validator->fails()) {
             return response()->json(['message' => $validator->errors()], 401);
         }
         $data = $validator->validated();
-        // $data = array_filter($data, function ($value) {
-        //     return $value !== null;
-        // });
-        // dd($data);
+
         $lines = $data["lines"];
         unset($data["lines"]);
         // dd($data,$lines);
-        $transfer = MdStockTransfer::create($data);
+        $check1 = [];
+        $check2 = [];
+        $oldstocks = [];
         foreach($lines as $line){
-            MdStock::create([
-                "cd_client_id" =>  $request->cd_client_id,
-                "cd_brand_id" =>  $request->cd_brand_id,
-                "cd_branch_id" =>  $request->cd_branch_id,
+            $oldstock = MdStock::where("md_storage_id",$data["md_from_storage_id"])
+            ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->first();
+            if($oldstock){
+                array_push($check2,1);
+                if($oldstock->current_qty >= $line["qty"]){
+                    $line["stock_id"] = $oldstock->id;
+                    $line["stock_qty"] = $oldstock->current_qty;
+                    array_push($oldstocks,$line);
+                    array_push($check1,1);
+                }else{
+                    array_push($check1,0);
+                }
+                return response()->json([$oldstock,$line["qty"]],200);
+            }else{
+                array_push($check2,0);
+            }
+            // MdStock::create([
+            //     "cd_client_id" =>  $request->cd_client_id,
+            //     "cd_brand_id" =>  $request->cd_brand_id,
+            //     "cd_branch_id" =>  $request->cd_branch_id,
 
-                "md_stock_transfer_id" => $transfer->id,
-                "md_product_id" => $line["md_product_id"],
-                "md_storage_id" => $request->md_from_storage_id,
-                "stock_type" => "transfer",
-                "qty" => ($line["qty"]*-1),
-                "unit" => $line["unit"],
-                // "cost" => $line["cost"],
-            ]);
-            MdStock::create([
-                "cd_client_id" =>  $request->cd_client_id,
-                "cd_brand_id" =>  $request->cd_brand_id,
-                "cd_branch_id" =>  $request->cd_branch_id,
-
-                "md_stock_transfer_id" => $transfer->id,
-                "md_product_id" => $line["md_product_id"],
-                "md_storage_id" => $request->md_to_storage_id,
-                "stock_type" => "transfer",
-                "qty" => ($line["qty"]),
-                "unit" => $line["unit"],
-                // "cost" => $line["cost"],
-            ]);
-            // MdStockTransferLine::create([
+            //     "md_stock_transfer_id" => $transfer->id,
             //     "md_product_id" => $line["md_product_id"],
-            //     "qty" => $line["qty"],
+            //     "md_storage_id" => $request->md_to_storage_id,
+            //     "stock_type" => "transfer",
+            //     "qty" => ($line["qty"]),
             //     "unit" => $line["unit"],
             //     // "cost" => $line["cost"],
             // ]);
-            // MdSupplyLine::create($line);
+            // MdStockTransferLine::create([
+            //     "md_product_id" => $line["md_product_id"],
+            //     "qty" => $line["qty"],
+            //     "uom_id" => $line["uom_id"],
+            //     "uom_type" => $line["uom_type"]
+            // ]);
         }
+        if(array_product($check1) == 1 && array_product($check2) == 1){
+            $transfer = MdStockTransfer::create($data);
+            foreach($oldstocks as $oline){
+                MdStock::where("id",$oline["stock_id"])->update([
+                    'current_qty' => $oline["stock_qty"] - $oline["qty"]
+                ]);
+                $newstock = MdStock::where("md_storage_id",$data["md_to_storage_id"])
+                ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->first();
+                if($newstock){
+                    
+                }else{
+
+                }
+                // MdStockTransferLine::create([
+                //     "md_product_id" => $line["md_product_id"],
+                //     "qty" => $line["qty"],
+                //     "uom_id" => $line["uom_id"],
+                //     "uom_type" => $line["uom_type"]
+                // ]);
+            }
+        }elseif(array_product($check1) != 1){
+            return response()->json(["error"=>"Sorry no enough stock available for one of the product to transfer!"],401);
+        }elseif(array_product($check2) != 1){
+            return response()->json(["error"=>"Sorry no stock available for this product!"],401);
+        }
+
         return response()->json(['message' => 'Stock Transferd Successfully',"data"=>""],200);
     }
 

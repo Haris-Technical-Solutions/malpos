@@ -258,10 +258,10 @@ class MdSupplyController extends Controller
         $oldstocks = [];
         foreach($s_lines as $s_line){
             $oldstock = MdStock::where('md_product_id',$s_line["md_product_id"])
-            ->where("cd_client_id", $old_supp->cd_client_id)
-            ->where("cd_brand_id", $old_supp->cd_brand_id)
-            // apply ->when on branch
-            ->where("cd_branch_id", $old_supp->cd_branch_id)
+            // ->where("cd_client_id", $old_supp->cd_client_id)
+            // ->where("cd_brand_id", $old_supp->cd_brand_id)
+            // // apply ->when on branch
+            // ->where("cd_branch_id", $old_supp->cd_branch_id)
             ->where("md_storage_id", $old_supp->md_storage_id)
             ->select("id","current_qty")
             ->first();
@@ -329,10 +329,10 @@ class MdSupplyController extends Controller
             // }
             // --------------------------stock-----------------------------------
             $stock = MdStock::where('md_product_id',$line["md_product_id"])
-            ->where("cd_client_id", $request->cd_client_id)
-            ->where("cd_brand_id", $request->cd_brand_id)
-            // apply ->when on branch
-            ->where("cd_branch_id", $request->cd_branch_id)
+            // ->where("cd_client_id", $request->cd_client_id)
+            // ->where("cd_brand_id", $request->cd_brand_id)
+            // // apply ->when on branch
+            // ->where("cd_branch_id", $request->cd_branch_id)
             ->where("md_storage_id", $request->md_storage_id)
             ->first();
 
@@ -418,10 +418,10 @@ class MdSupplyController extends Controller
         $oldstocks = [];
         foreach($s_lines as $s_line){
             $oldstock = MdStock::where('md_product_id',$s_line["md_product_id"])
-            ->where("cd_client_id", $old_supp->cd_client_id)
-            ->where("cd_brand_id", $old_supp->cd_brand_id)
-            // apply ->when on branch
-            ->where("cd_branch_id", $old_supp->cd_branch_id)
+            // ->where("cd_client_id", $old_supp->cd_client_id)
+            // ->where("cd_brand_id", $old_supp->cd_brand_id)
+            // // apply ->when on branch
+            // ->where("cd_branch_id", $old_supp->cd_branch_id)
             ->where("md_storage_id", $old_supp->md_storage_id)
             ->select("id","current_qty")
             ->first();

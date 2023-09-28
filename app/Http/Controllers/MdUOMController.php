@@ -33,18 +33,7 @@ class MdUOMController extends Controller
         ->select(["md_uoms_id","name"])
         ->first();
 
-        // $conversions = MdUomsConversion::where("md_uom_id",$base_unit->md_uoms_id)->where("is_active",1)->get();
         if($base_unit){
-            // array_push($units,["uom_id"=>$base_unit->md_uoms_id,"uom_type"=>"base_unit","name"=>$base_unit->name,"multiply_rate"=>1,"divide_rate"=>1]);
-            // foreach($conversions as $conversion){
-            //     array_push($units,[
-            //         "uom_id"=>$conversion->md_uoms_conversions_id ,
-            //         "uom_type"=>"conversion",
-            //         "name"=>$conversion->uom_to_name,
-            //         "multiply_rate"=>$conversion->multiply_rate,
-            //         "divide_rate"=>$conversion->divide_rate,
-            //     ]);
-            // }
             return response()->json(["data"=>$base_unit],200);
         }else{
             return response()->json(['error' => ["Sorry no base unit found for this product"]], 401);
