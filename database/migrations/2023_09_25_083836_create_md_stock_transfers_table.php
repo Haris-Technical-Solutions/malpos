@@ -23,6 +23,7 @@ return new class extends Migration
 
             $table->foreignId('md_from_storage_id')->on('md_storages');
             $table->foreignId('md_to_storage_id')->on('md_storages');
+            $table->boolean("is_deleted")->default(0);
             
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();

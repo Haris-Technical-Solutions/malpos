@@ -15,7 +15,7 @@ class MdCustomerController extends Controller
     public function index()
     {
         //
-        $data =  MdCustomer::all();
+        $data =  MdCustomer::with("group")->get();
         return response()->json($data);
 
     }
@@ -40,7 +40,7 @@ class MdCustomerController extends Controller
             "address" => ['nullable',"string"],
             "md_customer_group_id" => ['nullable',"numeric"],
             "phone" => ['required',"string"],
-            "is_active" => ['nullable',"string"],
+            "is_active" => ['nullable',"numeric"],
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
@@ -65,7 +65,7 @@ class MdCustomerController extends Controller
 
         MdCustomer::create($data);
         
-        return response()->json(["message"=>"Customer Created Succesfully!","data"=>$data]);
+        return response()->json(["message"=>"Customer Created Succesfully!","data"=>MdCustomer::getCustomer($data->id)]);
     }
 
     /**
@@ -78,12 +78,13 @@ class MdCustomerController extends Controller
 
     }
 
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit( $id)
     {
-        $data = MdCustomer::where("id",$id)->first();
+        $data = MdCustomer::getCustomer($id);
         if(!$data){
             return response()->json(["error"=>"Sorry no record Found!"]);
         }
@@ -105,7 +106,7 @@ class MdCustomerController extends Controller
             "address" => ['nullable',"string"],
             "md_customer_group_id" => ['nullable',"numeric"],
             "phone" => ['required',"string"],
-            "is_active" => ['nullable',"string"],
+            "is_active" => ['nullable',"numeric"],
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
@@ -129,7 +130,7 @@ class MdCustomerController extends Controller
 
         MdCustomer::where("id",$id)->update($data);
         
-        return response()->json(["message"=>"Customer Updated Succesfully!","data" => MdCustomer::where("id",$id)->first()]);
+        return response()->json(["message"=>"Customer Updated Succesfully!","data" => MdCustomer::getCustomer($id)]);
         
     }
 
@@ -138,7 +139,7 @@ class MdCustomerController extends Controller
      */
     public function destroy($id)
     {
-        if(!MdCustomer::where("id",$id)->first()){
+        if(!MdCustomer::getCustomer($id)){
             return response()->json(["error"=>"Sorry no record Found!"]);
         }
         $data = MdCustomer::where("id",$id)->delete();
