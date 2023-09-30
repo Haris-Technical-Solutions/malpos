@@ -40,8 +40,8 @@ class MdStorageController extends Controller
             ->where("cd_client_id",$request->cd_client_id)
             ->where("cd_brand_id",$request->cd_brand_id)
             ->where("cd_branch_id",$request->cd_branch_id)],
-            "created_by" => ['nullable',"string"],
-            "updated_by" => ['nullable',"string"],
+            "created_by" => ['required',"string"],
+            "updated_by" => ['required',"string"],
         ]);
 
         if ($validator->fails()) {
@@ -92,9 +92,10 @@ class MdStorageController extends Controller
                 ->where("cd_client_id",$request->cd_client_id)
                 ->where("cd_brand_id",$request->cd_brand_id)
                 ->where("cd_branch_id",$request->cd_branch_id)
-                ->ignore($id)],
-            "created_by" => ['nullable',"string"],
-            "updated_by" => ['nullable',"string"],
+                ->ignore($id)
+            ],
+            "created_by" => ['required',"string"],
+            "updated_by" => ['required',"string"],
         ]);
 
         if ($validator->fails()) {

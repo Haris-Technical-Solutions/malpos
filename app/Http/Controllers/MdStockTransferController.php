@@ -178,6 +178,11 @@ class MdStockTransferController extends Controller
 
     public function update(Request $request,$id)
     {
+        return response()->json(["error"=>"under construction "], 200);
+        $oldTransfer = MdStockTransfer::getTransfer($id);
+        if($oldTransfer->is_deleted == 1){
+            return response()->json(["error"=>"Sorry Deleted record cannot be updated!"], 200);
+        }
         $validator = Validator::make($request->all(), [
 
             "cd_client_id" => ['required',"numeric"],
@@ -200,7 +205,7 @@ class MdStockTransferController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $data = $validator->validated();
 
@@ -208,6 +213,7 @@ class MdStockTransferController extends Controller
         unset($data["lines"]);
         // --------------------------------------------------------------------------
         $ucheck1 = [];
+        $oldtransfer_u = [];
         $oldtransfer = MdStockTransfer::getTransfer($id);
         foreach($oldtransfer->stock_transfer_lines as $osline){
             // $product_base_unit = MdProductUnit::where("md_product_id",$osline["md_product_id"])
@@ -222,39 +228,60 @@ class MdStockTransferController extends Controller
             //         $osline["total_qty"]*=$unit->multiply_rate;
             //     }
             // }
-            return  response()->json([$osline["qty"]], 200);
+            // return  response()->json([$osline["qty"]], 200);
 
             $fromstock = MdStock::where("md_storage_id",$oldtransfer->md_from_storage_id)
-            ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->first();
+            ->where("md_product_id",$osline["md_product_id"])->where("is_deleted",0)->first();
 
             $tostock = MdStock::where("md_storage_id",$oldtransfer->md_to_storage_id)
-            ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->first();
+            ->where("md_product_id",$osline["md_product_id"])->where("is_deleted",0)->first();
+// -adjustment and also manage its removed items
+            $index = array_search($osline["md_product_id"], array_column($lines, 'md_product_id'));
+            if ($index !== false) {
+                $product = $lines[$index];
+            } else {
+                $product = null;
+            }
+            return  response()->json([$tostock->current_qty ,  $osline["qty"],$product], 200);
 
             if($tostock->current_qty >= $osline["qty"]){
-                // $osline["fromstockid"] => $fromstock->id,
-                // $osline["fromstockid"] => $fromstock->id,
+                $osline["fromstockid"] = $fromstock->id;
+                $osline["tostockid"] = $tostock->id;
+                $osline["fromstock_qty"] = $fromstock->current_qty;
+                $osline["tostock_qty"] = $tostock->current_qty;
+                array_push($oldtransfer_u,$osline);
                 array_push($ucheck1,1);
             }else{
                 array_push($ucheck1,0);
             }
-
-            {MdStock::where("md_storage_id",$oldtransfer->md_from_storage_id)
-            ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->update([
-                "current_qty" => $fromstock->current_qty + $osline["qty"]
-            ]);
-            MdStock::where("md_storage_id",$oldtransfer->md_to_storage_id)
-            ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->update([
-                "current_qty" => $tostock->current_qty - $osline["qty"]
-            ]);}
-            // return  response()->json($osline, 200);
+        }
+        // if(array_product($ucheck1) == 1){
+            
+            // return  response()->json(array_product($ucheck1), 200);
+        // }
+        // exit;
+        if(array_product($ucheck1) == 1){
+            foreach($oldtransfer_u as $oslineu)
+            {
+                MdStock::where('id',$oslineu["fromstockid"])->update([
+                    "current_qty" => $oslineu["fromstock_qty"] + $oslineu["qty"]
+                ]);
+                MdStock::where('id',$oslineu["tostockid"])->update([
+                    "current_qty" => $oslineu["tostock_qty"] - $oslineu["qty"]
+                ]);
+            }
+        }else{
+            return response()->json(["error"=>"Sorry no enough stock available for one of the product to transfer!"],401);
         }
         // --------------------------------------------------------------------------
+        return response()->json(["error"=>"fsvs"],401);
 
         // dd($data,$lines);
         $check1 = [];
         $check2 = [];
         $check3 = [];
         $oldstocks = [];
+
         foreach($lines as $line){
             $product_base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
             ->where('type',"unit")->first();
@@ -275,10 +302,15 @@ class MdStockTransferController extends Controller
 
             $oldstock = MdStock::where("md_storage_id",$data["md_from_storage_id"])
             ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->first();
-
+            // 
+            // $otl  = MdStockTransferLine::where("md_stock_transfer_id",$id)->where("md_product_id",$line["md_product_id"])->first();
+            // $adjustment = $otl?$otl->qty:0;
+            // $line["total_qty"] = $line["total_qty"]-$adjustment;
+            // 
             if($oldstock){
+                // return response()->json($oldstock->current_qty  >= $line["total_qty"]-$adjustment, 200);
                 array_push($check2,1);
-                if($oldstock->current_qty >= $line["total_qty"]){
+                if($oldstock->current_qty  >= $line["total_qty"]){
                     $line["stock_id"] = $oldstock->id;
                     $line["stock_qty"] = $oldstock->current_qty;
                     array_push($oldstocks,$line);
@@ -291,6 +323,13 @@ class MdStockTransferController extends Controller
                 array_push($check2,0);
             }
         }
+
+        // $removed = MdStockTransferLine::where("md_stock_transfer_id",$id)->whereNotIn('md_product_id',array_column($lines,'md_product_id'))->get();
+        // foreach($removed as $rem){
+
+        // }
+        // return response()->json($removed,200);
+
 
         if(array_product($check1) == 1 && array_product($check2) == 1 && array_product($check3) == 1 ){
             $transfer = MdStockTransfer::create($data);
