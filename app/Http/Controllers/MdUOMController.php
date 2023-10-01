@@ -68,7 +68,7 @@ class MdUOMController extends Controller
             "updated_by" => ['nullable',"string"],
         ]);
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $data = $validator->validated();
         $data["type"] = "user_defined";
@@ -121,7 +121,7 @@ class MdUOMController extends Controller
             "updated_by" => ['nullable',"string"],
         ]);
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $data = $validator->validated();
         MdUom::where("md_uoms_id",$id)->update($data);
@@ -133,12 +133,15 @@ class MdUOMController extends Controller
      */
     public function destroy($id)
     {
-        $data = MdUom::where("md_uoms_id",$id)->first();
-        if(!MdUom::where("md_uoms_id",$id)->first()){
+        $data = MdUom::where("md_uoms_id",$id)->where("is_active",1)->first();
+        if(!$data){
             return response()->json(['error' => 'Sorry no record Found!'],200);
         }
-        if(MdUomsConversion::where("cd_client_id",$data->cd_client_id)->where("is_active",1)->where("md_uoms_id",$id)->first()){
-            return response()->json(['message' => 'UOM Cannot be Deleted, Because it is associated to uom conversion'],200);
+        if(MdUomsConversion::
+            where("cd_client_id",$data->cd_client_id)->
+            where("is_active",1)
+            ->where("md_uom_id",$id)->first()){
+            return response()->json(['error' => 'UOM Cannot be Deleted, Because it is associated to uom conversions'],200);
         }
 
         MdUom::where("md_uoms_id",$id)->update(["is_active" => 0]);
