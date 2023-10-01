@@ -47,7 +47,7 @@ class MdUOMConversionController extends Controller
             "updated_by" => ['nullable',"string"],
         ]);
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $data = $validator->validated();
         // dd($data);
@@ -102,7 +102,7 @@ class MdUOMConversionController extends Controller
             "updated_by" => ['nullable',"string"],
         ]);
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $data = $validator->validated();
         MdUomsConversion::where("md_uoms_conversions_id",$id)->update($data);
@@ -114,10 +114,10 @@ class MdUOMConversionController extends Controller
      */
     public function destroy($id)
     {
-        if(!MdUomsConversion::where("md_uoms_conversions_id",$id)->first()){
+        if(!MdUomsConversion::where("md_uoms_conversions_id",$id)->where("is_active" , 1)->first()){
             return response()->json(['error' => 'Sorry no record Found!'],200);
         }
         MdUomsConversion::where("md_uoms_conversions_id",$id)->update(["is_active" => 0]);
-        return response()->json(['message' => 'UOM Deleted Successfully'],200);
+        return response()->json(['message' => 'UOM Conversion Deleted Successfully'],200);
     }
 }
