@@ -36,12 +36,12 @@ class MdUOMConversionController extends Controller
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
             
-            "md_uom_id" => ["required" , "string"],
+            "md_uom_id" => ["required" , "numeric"],
             "uom_to_name" => ["required" , "string",Rule::unique('md_uoms_conversions')
                 ->where("cd_client_id",$request->cd_client_id)
             ],
-            "multiply_rate" => ["required" , "string"],
-            "divide_rate" => ["required" , "string"],
+            "multiply_rate" => ["required" , "numeric"],
+            "divide_rate" => ["required" , "numeric"],
 
             "created_by" => ['nullable',"string"],
             "updated_by" => ['nullable',"string"],
@@ -91,13 +91,13 @@ class MdUOMConversionController extends Controller
             "cd_brand_id" => ['required',"numeric"],
             "cd_branch_id" => ['required',"numeric"],
             
-            "md_uom_id" => ["required" , "string"],
+            "md_uom_id" => ["required" , "numeric"],
             "uom_to_name" => ["required" , "string",Rule::unique('md_uoms_conversions')
                 ->where("cd_client_id",$request->cd_client_id)
                 ->whereNot("md_uoms_conversions_id",$id)
             ],
-            "multiply_rate" => ["required" , "string"],
-            "divide_rate" => ["required" , "string"],
+            "multiply_rate" => ["required" , "numeric"],
+            "divide_rate" => ["required" , "numeric"],
 
             "updated_by" => ['nullable',"string"],
         ]);
