@@ -20,24 +20,83 @@ class MdUOMController extends Controller
         return response()->json(["data"=>$data],200);
     }
     
-    public function get_units_by_product($product_id)
-    {
-        $units = [];
-        $pu = MdProductUnit::where("md_product_id",$product_id)->where("is_deleted",0)->first();
-        $base_unit = MdUom::where("md_uoms_id",$pu->md_uom_id)->where("is_active",1)
-        ->with(["conversions"=> function ($query) {
-            $query->select("md_uom_id","md_uoms_conversions_id","uom_to_name as name","multiply_rate","divide_rate");
-        }])->whereHas('conversions', function ($query) {
-            return $query->where('is_active', 1);
-        })
-        ->select(["md_uoms_id","name"])
-        ->first();
+    // public function get_units_by_product($product_id)
+    // {
+    //     $units = [];
+    //     $pu = MdProductUnit::where("md_product_id",$product_id)->where("is_deleted",0)->first();
+    //     $base_unit = MdUom::where("md_uoms_id",$pu->md_uom_id)->where("is_active",1)
+    //     ->with(["conversions"=> function ($query) {
+    //         $query->select("md_uom_id","md_uoms_conversions_id","uom_to_name as name","multiply_rate","divide_rate");
+    //     }])->whereHas('conversions', function ($query) {
+    //         return $query->where('is_active', 1);
+    //     })
+    //     ->select(["md_uoms_id","name"])
+    //     ->first();
 
-        if($base_unit){
-            return response()->json(["data"=>$base_unit],200);
-        }else{
-            return response()->json(['error' => ["Sorry no base unit found for this product"]], 401);
+    //     if($base_unit){
+    //         return response()->json(["data"=>$base_unit],200);
+    //     }else{
+    //         return response()->json(['error' => ["Sorry no base unit found for this product"]], 401);
+    //     }
+    // }
+    
+    public function get_units_by_product(Request $request,$product_id)
+    {
+        
+        $validator = Validator::make($request->all(), [
+            "cd_client_id" => ['required',"numeric"],
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 401);
         }
+
+        $units = [];
+        $unit = MdProductUnit::where("md_product_id",$product_id)
+        ->where("cd_client_id",$request->cd_client_id)
+        ->where("type","unit")
+        ->with("unit:md_uoms_id,name,type,code,symbol")
+        ->where("is_deleted",0)
+        ->first();
+        if(!$unit){
+            return response()->json(['error' => "Sorry no base unit found for this product!"], 401);
+        }
+        $conversions = MdProductUnit::where("md_product_id",$product_id)
+        ->where("cd_client_id",$request->cd_client_id)
+        ->where("type","conversion")
+        ->with("conversion:md_uoms_conversions_id,uom_to_name,multiply_rate,divide_rate")
+        ->where("is_deleted",0)
+        ->get();
+        
+        $units[0]["md_product_units_id"] = $unit->md_product_units_id;
+        $units[0]["name"] = $unit->unit["name"];
+        $units[0]["symbol"] = $unit->unit["symbol"];
+        $units[0]["multiply_rate"] = 1;
+        $units[0]["divide_rate"] = 1;
+
+        foreach($conversions as $key => $conversion){
+            $keys = $key+1;
+            $units[$key]["md_product_units_id"] = $conversion->md_product_units_id;
+            $units[$key]["name"] = $conversion->conversion["uom_to_name"];
+            $units[$key]["symbol"] = $conversion->conversion["uom_to_name"];
+            $units[$key]["multiply_rate"] = $conversion->conversion["multiply_rate"];
+            $units[$key]["divide_rate"] = $conversion->conversion["divide_rate"];
+        }
+        return response()->json($units, 200);
+        // return response()->json($conversions,200);
+        // $base_unit = MdUom::where("md_uoms_id",$pu->md_uom_id)->where("is_active",1)
+        // ->with(["conversions"=> function ($query) {
+        //     $query->select("md_uom_id","md_uoms_conversions_id","uom_to_name as name","multiply_rate","divide_rate");
+        // }])->whereHas('conversions', function ($query) {
+        //     return $query->where('is_active', 1);
+        // })
+        // ->select(["md_uoms_id","name"])
+        // ->first();
+
+        // if($base_unit){
+        //     return response()->json(["data"=>$base_unit],200);
+        // }else{
+        //     return response()->json(['error' => ["Sorry no base unit found for this product"]], 401);
+        // }
     }
 
     /**
@@ -75,7 +134,6 @@ class MdUOMController extends Controller
         $data["is_active"] = "1";
         $uom = MdUom::create($data);
         return response()->json(['message' => 'UOM Created Successfully',"data"=>MdUom::where("md_uoms_id",$uom->id)->first()],200);
-
     }
 
     /**

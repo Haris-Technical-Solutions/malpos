@@ -228,7 +228,7 @@ Route::post('md_customer/update/{id}', [MdCustomerController::class, 'update'])-
 
 Route::resource('uom', MdUOMController::class);
 Route::post("uom/update/{id}",[MdUOMController::class,"update"]);
-Route::get("uom/get_units_by_product/{product_id}",[MdUOMController::class,"get_units_by_product"]);
+Route::post("uom/get_units_by_product/{product_id}",[MdUOMController::class,"get_units_by_product"]);
 
 Route::resource('uom_conversion', MdUOMConversionController::class);
 Route::post("uom_conversion/update/{id}",[MdUOMConversionController::class,"update"]);

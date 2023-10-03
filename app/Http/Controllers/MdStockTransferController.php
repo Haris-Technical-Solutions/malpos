@@ -11,6 +11,7 @@ use App\Models\MdStorage;
 use App\Models\MdStockTransferLine;
 use App\Models\MdProductUnit;
 use App\Models\MdUomsConversion;
+use App\Models\MdStockHistory;
 // use App\Models\MdStockTransferLine;
 use Illuminate\Validation\Rule;
 
@@ -51,44 +52,59 @@ class MdStockTransferController extends Controller
 
             "reason" => ['nullable',"string"],
 
-            "created_by" => ['nullable',"string"],
+            "created_by" => ['required',"string"],
             "updated_by" => ['nullable',"string"],
             // 
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
-            "lines.*.uom_id" => ['required',"string"],
-            "lines.*.uom_type" => ['required',"string"],
+            "lines.*.md_product_units_id" => ['required',"numeric"],
+            // "lines.*.uom_id" => ['required',"string"],
+            // "lines.*.uom_type" => ['required',"string"],
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 401);
+            return response()->json(['error' => $validator->errors()], 401);
         }
         $data = $validator->validated();
 
         $lines = $data["lines"];
         unset($data["lines"]);
         // dd($data,$lines);
+        if(!MdStorage::where("id",$data["md_from_storage_id"])
+        // add client brand branch id
+        ->where("is_active",1)->first()){
+            return response()->json(['error' => "From Storage not Found"], 401);
+
+        }
+        if(!MdStorage::where("id",$data["md_to_storage_id"])
+        //add client brand branch
+        ->where("is_active",1)->first()){
+            return response()->json(['error' => "To Storage not Found"], 401);
+        }
+
+        $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
         $check1 = [];
         $check2 = [];
-        $check3 = [];
+        // $check3 = [];
         $oldstocks = [];
-        foreach($lines as $line){
-            $product_base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
-            ->where('type',"unit")->first();
-            if(!$product_base_unit){
-                // return response()->json("no base unit found");
-                array_push($check3,0);
-            }else{
-                array_push($check3,1);
-                $line["total_qty"] = $line["qty"];
-                $line["base_unit"] = $product_base_unit->md_uom_id;
-                if($line["uom_type"] == "conversion"){
-                    $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
-                    if($unit){
-                        $line["total_qty"]*=$unit->multiply_rate;
-                    }
-                }
-            }
+                // return response()->json($rows);
+        foreach($rows as $line){
+            // $product_base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
+            // ->where('type',"unit")->first();
+            // if(!$product_base_unit){
+            //     // return response()->json("no base unit found");
+            //     array_push($check3,0);
+            // }else{
+            //     array_push($check3,1);
+            //     $line["total_qty"] = $line["qty"];
+            //     $line["product_base_unit_id"] = $product_base_unit->md_uom_id;
+            //     if($line["uom_type"] == "conversion"){
+            //         $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
+            //         if($unit){
+            //             $line["total_qty"]*=$unit->multiply_rate;
+            //         }
+            //     }
+            // }
 
 
             $oldstock = MdStock::where("md_storage_id",$data["md_from_storage_id"])
@@ -96,7 +112,7 @@ class MdStockTransferController extends Controller
 
             if($oldstock){
                 array_push($check2,1);
-                if($oldstock->current_qty >= $line["total_qty"]){
+                if($oldstock->current_qty >= $line["qty"]){
                     $line["stock_id"] = $oldstock->id;
                     $line["stock_qty"] = $oldstock->current_qty;
                     array_push($oldstocks,$line);
@@ -110,18 +126,18 @@ class MdStockTransferController extends Controller
             }
         }
 
-        if(array_product($check1) == 1 && array_product($check2) == 1 && array_product($check3) == 1 ){
+        if(array_product($check1) == 1 && array_product($check2) == 1 ){
             $transfer = MdStockTransfer::create($data);
             foreach($oldstocks as $oline){
                 //
                 MdStock::where("id",$oline["stock_id"])->update([
-                    'current_qty' => $oline["stock_qty"] - $oline["total_qty"]
+                    'current_qty' => $oline["stock_qty"] - $oline["qty"]
                 ]);
                 $newstock = MdStock::where("md_storage_id",$data["md_to_storage_id"])
                 ->where("md_product_id",$oline["md_product_id"])->where("is_deleted",0)->first();
                 if($newstock){
                     MdStock::where("id",$newstock->id)->update([
-                        'current_qty' => $newstock->current_qty + $oline["total_qty"]
+                        'current_qty' => $newstock->current_qty + $oline["qty"]
                     ]);
                 }else{
                     $storage = MdStorage::where("id",$data["md_to_storage_id"])->where("is_active",1)->first();
@@ -129,27 +145,60 @@ class MdStockTransferController extends Controller
                         "cd_client_id" =>  $storage->cd_client_id,
                         "cd_brand_id" =>  $storage->cd_brand_id,
                         "cd_branch_id" =>  $storage->cd_branch_id,
-                        "md_uom_id" =>  $oline["base_unit"],
+                        "md_uom_id" =>  $oline["product_base_unit_id"],
                         "md_storage_id" => $data["md_to_storage_id"],
-                        "current_qty" => $oline["total_qty"],
+                        "current_qty" => $oline["qty"],
                         "md_product_id" => $oline["md_product_id"],
                     ]);
                 }
+                
+                MdStockHistory::create([
+                    "cd_client_id" =>  $request->cd_client_id,
+                    "cd_brand_id" =>  $request->cd_brand_id,
+                    "cd_branch_id" =>  $request->cd_branch_id,
+                    "type" => "stock_transfer",
+                    "type_id" => $transfer->id,
+                    "action" => "create",
+                    "md_product_id" => $oline["md_product_id"],
+                    "md_product_units_id" => $oline["md_product_units_id"],
+                    "qty" => ($oline["qty"]*-1),
+                    "input_qty" => ($oline["input_qty"]*-1),
+                    "md_storage_id" => $data["md_from_storage_id"],
+                    "created_by" => $request->created_by,
+
+                ]);
+                MdStockHistory::create([
+                    "cd_client_id" =>  $request->cd_client_id,
+                    "cd_brand_id" =>  $request->cd_brand_id,
+                    "cd_branch_id" =>  $request->cd_branch_id,
+                    "type" => "stock_transfer",
+                    "type_id" => $transfer->id,
+                    "action" => "create",
+                    "md_product_id" => $oline["md_product_id"],
+                    "md_product_units_id" => $oline["md_product_units_id"],
+                    "qty" => $oline["qty"],
+                    "input_qty" => $oline["input_qty"],
+                    "md_storage_id" => $data["md_to_storage_id"],
+                    "created_by" => $request->created_by,
+
+                ]);
                 MdStockTransferLine::create([
                     "md_stock_transfer_id"=>$transfer->id,
                     "md_product_id" => $oline["md_product_id"],
-                    "qty" => $oline["total_qty"],
-                    "uom_id" => $oline["uom_id"],
-                    "uom_type" => $oline["uom_type"]
+                    "input_qty" => $oline["input_qty"],
+                    "qty" => $oline["qty"],
+                    "md_product_units_id" => $oline["md_product_units_id"],
+                    // "uom_type" => $oline["uom_type"]
                 ]);
             }
         }elseif(array_product($check1) != 1){
             return response()->json(["error"=>"Sorry no enough stock available for one of the product to transfer!"],401);
         }elseif(array_product($check2) != 1){
             return response()->json(["error"=>"Sorry no stock available for one of the product!"],401);
-        }elseif(array_product($check3) != 1){
-            return response()->json(["error"=>"Sorry one of the product's base unit not found!"],401);
         }
+        // elseif(array_product($check3) != 1){
+        //     return response()->json(["error"=>"Sorry one of the product's base unit not found!"],401);
+        // }
 
         return response()->json(['message' => 'Stock Transferd Successfully',"data"=>MdStockTransfer::getTransfer($transfer->id)],200);
     }
@@ -220,7 +269,7 @@ class MdStockTransferController extends Controller
             // ->where('type',"unit")->first();
 
             // $osline["total_qty"] = $osline["qty"];
-            // $osline["base_unit"] = $product_base_unit->md_uom_id;
+            // $osline["product_base_unit_id"] = $product_base_unit->md_uom_id;
 
             // if($osline["uom_type"] == "conversion"){
             //     $unit=MdUomsConversion::where("md_uoms_conversions_id",$osline["uom_id"])->first();
@@ -235,7 +284,7 @@ class MdStockTransferController extends Controller
 
             $tostock = MdStock::where("md_storage_id",$oldtransfer->md_to_storage_id)
             ->where("md_product_id",$osline["md_product_id"])->where("is_deleted",0)->first();
-// -adjustment and also manage its removed items
+        // -adjustment and also manage its removed items
             $index = array_search($osline["md_product_id"], array_column($lines, 'md_product_id'));
             if ($index !== false) {
                 $product = $lines[$index];
@@ -290,7 +339,7 @@ class MdStockTransferController extends Controller
             }else{
                 array_push($check3,1);
                 $line["total_qty"] = $line["qty"];
-                $line["base_unit"] = $product_base_unit->md_uom_id;
+                $line["product_base_unit_id"] = $product_base_unit->md_uom_id;
                 if($line["uom_type"] == "conversion"){
                     $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
                     if($unit){
@@ -350,7 +399,7 @@ class MdStockTransferController extends Controller
                         "cd_client_id" =>  $storage->cd_client_id,
                         "cd_brand_id" =>  $storage->cd_brand_id,
                         "cd_branch_id" =>  $storage->cd_branch_id,
-                        "md_uom_id" =>  $oline["base_unit"],
+                        "md_uom_id" =>  $oline["product_base_unit_id"],
                         "md_storage_id" => $data["md_to_storage_id"],
                         "current_qty" => $oline["total_qty"],
                         "md_product_id" => $oline["md_product_id"],

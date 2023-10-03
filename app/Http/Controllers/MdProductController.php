@@ -321,7 +321,7 @@ class MdProductController extends Controller
         $product_diets_delete = MdProductDiet::where('md_product_id', $id)->delete();
 
 
-        MdProductUnit::where("md_product_id", $id)->delete();
+        MdProductUnit::where("md_product_id", $id)->where("type","unit")->delete();
         MdProductUnit::create([
             "cd_client_id"=> $request->input('cd_client_id'),
             // "cd_brand_id"=> $request->input('cd_brand_id'),

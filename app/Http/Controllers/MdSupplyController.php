@@ -12,6 +12,7 @@ use App\Models\MdSuppliesLine;
 use App\Models\MdProductCost;
 use App\Models\MdProductUnit;
 use App\Models\MdUomsConversion;
+use App\Models\MdStockHistory;
 
 class MdSupplyController extends Controller
 {
@@ -64,8 +65,9 @@ class MdSupplyController extends Controller
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
             "lines.*.total" => ['required',"numeric"],
-            "lines.*.uom_id" => ['required',"numeric"],
-            "lines.*.uom_type" => ['required',"string"],
+            "lines.*.md_product_units_id" => ['required',"numeric"],
+            // "lines.*.uom_id" => ['required',"numeric"],
+            // "lines.*.uom_type" => ['required',"string"],
             "lines.*.cost" => ['required',"numeric"],
             "lines.*.discount_percent" => ['nullable',"numeric"],
             "lines.*.tax" => ['nullable',"numeric"],
@@ -87,29 +89,31 @@ class MdSupplyController extends Controller
         }
         $lines = $data["lines"];
         unset($data["lines"]);
-        // dd($data,$lines);
+
+        $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
 
         $supply = MdSupply::create($data);
-        foreach($lines as $line){
+        foreach($rows as $line){
             // ------------------conversion- -------------------------
-            $product_base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
-            ->where('type',"unit")->first();
-            if(!$product_base_unit){
-                return response()->json("no base unit found");
-                // do it later, delete created
-            }
+            // $product_base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
+            // ->where('type',"unit")->first();
+            // if(!$product_base_unit){
+            //     return response()->json("no base unit found");
+            //     // do it later, delete created
+            // }
             $qty = $line["qty"];
 
-            if($line["uom_type"] == "conversion"){
-                $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
-                $qty*=$unit->multiply_rate;
-            }
+            // if($line["uom_type"] == "conversion"){
+            //     $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
+            //     $qty*=$unit->multiply_rate;
+            // }
 
             // if($product_base_unit->id != $line["md_product_unit_id"]){
             //     $unit = MdProductUnit::where("id",$line["md_product_unit_id"])->select("md_uom_conversion_id")
             //     ->with("conversion:md_uoms_conversions_id,multiply_rate,divide_rate")->first();
             //     $qty*=$unit->conversion["multiply_rate"];
             // }
+            // dd();
 
             // add line_amount and total in table lines
             // -------------------oldcost---------------------------
@@ -141,15 +145,16 @@ class MdSupplyController extends Controller
             }else{
                 $avg_cost = $line["cost"];
             }
+
             if($data["status"] == "approved"){
                 if($stock){
-                MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
-                MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
+                MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $line["product_base_unit_id"],"current_qty"=>$stock->current_qty+$qty]);
+                // MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $line["product_base_unit_id"],"current_qty"=>$stock->current_qty+$qty]);
                 // return response()->json([
                 //     ((($oldcost)."*".$stock->current_qty."+".$qty."*".$line["cost"])."/".($stock->current_qty."+".$qty)),
                 //     round($avg_cost,2)
                 // ]);
-                    MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
+                    // MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $line["product_base_unit_id"],"current_qty"=>$stock->current_qty+$qty]);
                 // return response()->json([
                 //     ((($oldcost)."*".$stock->current_qty."+".$qty."*".$line["cost"])."/".($stock->current_qty."+".$qty)),
                 //     round($avg_cost,2)
@@ -159,7 +164,7 @@ class MdSupplyController extends Controller
                         "cd_client_id" =>  $request->cd_client_id,
                         "cd_brand_id" =>  $request->cd_brand_id,
                         "cd_branch_id" =>  $request->cd_branch_id,
-                        "md_uom_id" =>  $product_base_unit->md_uom_id,
+                        "md_uom_id" =>  $line["product_base_unit_id"],
 
                         // "md_supply_id" => $supply->id,
                         "md_storage_id" => $request->md_storage_id,
@@ -167,6 +172,21 @@ class MdSupplyController extends Controller
                         "md_product_id" => $line["md_product_id"],
                     ]);
                 }
+                MdStockHistory::create([
+                    "cd_client_id" =>  $request->cd_client_id,
+                    "cd_brand_id" =>  $request->cd_brand_id,
+                    "cd_branch_id" =>  $request->cd_branch_id,
+                    "type" => "supplies",
+                    "type_id" => $supply->id,
+                    "action" => "create",
+                    "md_product_id" => $line["md_product_id"],
+                    "md_product_units_id" => $line["md_product_units_id"],
+                    "qty" => $line["qty"],
+                    "input_qty" => $line["input_qty"],
+                    "md_storage_id" => $request->md_storage_id,
+                    "created_by" => $request->updated_by,
+
+                ]);
                 // -----------------------------cost-----------------------------------
                 if($cost){
                     MdProductCost::where('id',$cost->id)->update([
@@ -184,10 +204,11 @@ class MdSupplyController extends Controller
                 //------------------------------------------------------------------
             }
             $line["md_supply_id"] = $supply->id;
-            $line["line_amount"] = $qty*$line["cost"];
-            $line["qty"] = $qty;
+            // $line["line_amount"] = $qty*$line["cost"];
+            $line["line_amount"] = $line["qty"]*$line["cost"];
+            // $line["qty"] = $qty;
             $line["avg_cost"] = $avg_cost;
-
+            unset($line["product_base_unit_id"]);
             MdSuppliesLine::create($line);
         }
         return response()->json(['message' => 'Supply Created Successfully',"data"=>MdSupply::getSupply($supply->id)],200);
@@ -236,9 +257,8 @@ class MdSupplyController extends Controller
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
             "lines.*.total" => ['required',"numeric"],
-            // "lines.*.md_product_unit_id" => ['required',"numeric"],
-            "lines.*.uom_id" => ['required',"numeric"],
-            "lines.*.uom_type" => ['required',"string"],
+            "lines.*.md_product_units_id" => ['required',"numeric"],
+            // "lines.*.uom_type" => ['required',"string"],
             "lines.*.cost" => ['required',"numeric"],
             "lines.*.discount_percent" => ['nullable',"numeric"],
             "lines.*.tax" => ['nullable',"numeric"],
@@ -251,7 +271,7 @@ class MdSupplyController extends Controller
 
         $lines = $data["lines"];
         unset($data["lines"]);
-
+        $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
         $old_supp = MdSupply::where("id",$id)->first();
         $s_lines = MdSuppliesLine::where("is_deleted",0)->where("md_supply_id",$id)->get();
         $check = [];
@@ -307,21 +327,49 @@ class MdSupplyController extends Controller
         }else{
             return response()->json(["data"=>"Sorry this Supply is not editable because negative stocks are not possible"], 401);
         }
+        // ------------------conversion- -------------------------
+        // foreach($lines as $key=>$line){
+        //     $base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
+        //     ->where("is_deleted",0)
+        //     ->where('type',"unit")->first();
+        //     if(!$base_unit)
+        //     {
+        //         return response()->json(["error"=>"no base unit found for this product!","product"=>$key+1]);
+        //     }
+
+        //     $unit = MdProductUnit::get_unit($line["md_product_units_id"],$line["md_product_id"],$request->cd_client_id);
+        //     if(!$unit)
+        //     {
+        //         return response()->json(["error"=>"no selectd unit found for this product!","product"=>$key+1]);
+        //     }
+        //     if($unit->type == "conversion"){
+        //         $line["input_qty"] = $line["qty"];
+        //         $line["qty"] = $line["qty"]*$unit->conversion["multiply_rate"];
+        //     }else{
+        //         $line["input_qty"] = $line["qty"];
+        //     }
+        //     $line["line_amount"] = $line["qty"]*$line["cost"];
+        //     $line["product_base_unit_id"] = $base_unit->md_uom_id;
+        //     array_push($rows,$line);
+            // return response()->json($rows);
+            
+        // }
         // ---------------------------------------------------------------------------------------------------
+
         $supply = MdSupply::where("id",$id)->update($data);
-        foreach($lines as $line){
+        foreach($rows as $line){
             // ------------------conversion- -------------------------
-            $product_base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
-            ->where('type',"unit")->first();
-            if(!$product_base_unit){
-                return response()->json("no base unit found");
-                // do it later, delete created
-            }
+            // $product_base_unit = MdProductUnit::where("md_product_id",$line["md_product_id"])
+            // ->where('type',"unit")->first();
+            // if(!$product_base_unit){
+            //     return response()->json("no base unit found");
+            //     // do it later, delete created
+            // }
             $qty = $line["qty"];
-            if($line["uom_type"] == "conversion"){
-                $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
-                $qty*=$unit->multiply_rate;
-            }
+            // if($line["uom_type"] == "conversion"){
+            //     $unit=MdUomsConversion::where("md_uoms_conversions_id",$line["uom_id"])->first();
+            //     $qty*=$unit->multiply_rate;
+            // }
             // if($product_base_unit->id != $line["md_product_unit_id"]){
             //     $unit = MdProductUnit::where("id",$line["md_product_unit_id"])->select("md_uom_conversion_id")
             //     ->with("conversion:md_uoms_conversions_id,multiply_rate,divide_rate")->first();
@@ -352,23 +400,23 @@ class MdSupplyController extends Controller
 
             if($data["status"] == "approved"){
                 if($stock){
-                MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
-                MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
-                // return response()->json([
-                //     ((($oldcost)."*".$stock->current_qty."+".$qty."*".$line["cost"])."/".($stock->current_qty."+".$qty)),
-                //     round($avg_cost,2)
-                // ]);
-                    MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
-                // return response()->json([
-                //     ((($oldcost)."*".$stock->current_qty."+".$qty."*".$line["cost"])."/".($stock->current_qty."+".$qty)),
-                //     round($avg_cost,2)
-                // ]);
+                    MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $line["product_base_unit_id"],"current_qty"=>$stock->current_qty+$qty]);
+                    // MdStock::`where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
+                    // return response()->json([
+                    //     ((($oldcost)."*".$stock->current_qty."+".$qty."*".$line["cost"])."/".($stock->current_qty."+".$qty)),
+                    //     round($avg_cost,2)
+                    // ]);
+                        // MdStock::where("id",$stock->id)->update(["md_uom_id" =>  $product_base_unit->md_uom_id,"current_qty"=>$stock->current_qty+$qty]);
+                    // return response()->json([
+                    //     ((($oldcost)."*".$stock->current_qty."+".$qty."*".$line["cost"])."/".($stock->current_qty."+".$qty)),
+                    //     round($avg_cost,2)
+                    // ]);`
                 }else{
                     MdStock::create([
                         "cd_client_id" =>  $request->cd_client_id,
                         "cd_brand_id" =>  $request->cd_brand_id,
                         "cd_branch_id" =>  $request->cd_branch_id,
-                        "md_uom_id" =>  $product_base_unit->md_uom_id,
+                        "md_uom_id" =>  $line["product_base_unit_id"],
 
                         // "md_supply_id" => $supply->id,
                         "md_storage_id" => $request->md_storage_id,
@@ -376,6 +424,21 @@ class MdSupplyController extends Controller
                         "md_product_id" => $line["md_product_id"],
                     ]);
                 }
+                MdStockHistory::create([
+                    "cd_client_id" =>  $request->cd_client_id,
+                    "cd_brand_id" =>  $request->cd_brand_id,
+                    "cd_branch_id" =>  $request->cd_branch_id,
+                    "type" => "supplies",
+                    "type_id" => $id,
+                    "action" => "update",
+                    "md_product_id" => $line["md_product_id"],
+                    "md_product_units_id" => $line["md_product_units_id"],
+                    "qty" => $line["qty"],
+                    "input_qty" => $line["input_qty"],
+                    "md_storage_id" => $request->md_storage_id,
+                    "created_by" => $request->updated_by,
+
+                ]);
                 // -----------------------------cost-----------------------------------
                 if($cost){
                     MdProductCost::where('id',$cost->id)->update([
@@ -394,15 +457,19 @@ class MdSupplyController extends Controller
             }
 
             $line["md_supply_id"] = $id;
-            $line["line_amount"] = $qty*$line["cost"];
-            $line["qty"] = $qty;
+            // $line["line_amount"] = $qty*$line["cost"];
+            $line["line_amount"] = $line["qty"]*$line["cost"];
+            // $line["qty"] = $qty;
             $line["avg_cost"] = $avg_cost;
+            unset($line["product_base_unit_id"]);
 
             MdSuppliesLine::create($line);
         }
         return response()->json(['message' => 'Supply Updated Successfully',"data"=>MdSupply::getSupply($id)],200);
 
     }
+
+    
 
     /**
      * Remove the specified resource from storage.

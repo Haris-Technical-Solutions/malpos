@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('cd_brand_id')->on('cd_brands')->nullable();
             $table->foreignId('cd_branch_id')->on('cd_branchs')->nullable();
 
-            $table->foreignId('md_uom_id')->on('md_unit_of_measurements');
+            // $table->foreignId('md_uom_id')->on('md_unit_of_measurements');
             $table->string('uom_to_name');
             $table->double('multiply_rate')->nullable();
             $table->double('divide_rate')->nullable();
