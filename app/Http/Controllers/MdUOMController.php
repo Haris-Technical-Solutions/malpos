@@ -72,14 +72,15 @@ class MdUOMController extends Controller
         $units[0]["symbol"] = $unit->unit["symbol"];
         $units[0]["multiply_rate"] = 1;
         $units[0]["divide_rate"] = 1;
-
+        $i = 1;
         foreach($conversions as $key => $conversion){
-            $keys = $key+1;
-            $units[$key]["md_product_units_id"] = $conversion->md_product_units_id;
-            $units[$key]["name"] = $conversion->conversion["uom_to_name"];
-            $units[$key]["symbol"] = $conversion->conversion["uom_to_name"];
-            $units[$key]["multiply_rate"] = $conversion->conversion["multiply_rate"];
-            $units[$key]["divide_rate"] = $conversion->conversion["divide_rate"];
+            // $keys = $key+1;
+            $units[$i]["md_product_units_id"] = $conversion->md_product_units_id;
+            $units[$i]["name"] = $conversion->conversion["uom_to_name"];
+            $units[$i]["symbol"] = $conversion->conversion["uom_to_name"];
+            $units[$i]["multiply_rate"] = $conversion->conversion["multiply_rate"];
+            $units[$i]["divide_rate"] = $conversion->conversion["divide_rate"];
+            $i++;
         }
         return response()->json($units, 200);
         // return response()->json($conversions,200);
