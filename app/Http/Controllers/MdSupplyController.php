@@ -65,9 +65,7 @@ class MdSupplyController extends Controller
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
             "lines.*.total" => ['required',"numeric"],
-            "lines.*.md_product_units_id" => ['required',"numeric"],
-            // "lines.*.uom_id" => ['required',"numeric"],
-            // "lines.*.uom_type" => ['required',"string"],
+            "lines.*.md_uom_id" => ['required',"numeric"],
             "lines.*.cost" => ['required',"numeric"],
             "lines.*.discount_percent" => ['nullable',"numeric"],
             "lines.*.tax" => ['nullable',"numeric"],
@@ -90,7 +88,7 @@ class MdSupplyController extends Controller
         $lines = $data["lines"];
         unset($data["lines"]);
 
-        $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
+        $rows = MdUomsConversion::qty_conversion($lines,$request->cd_client_id);
 
         $supply = MdSupply::create($data);
         foreach($rows as $line){
@@ -180,7 +178,7 @@ class MdSupplyController extends Controller
                     "type_id" => $supply->id,
                     "action" => "create",
                     "md_product_id" => $line["md_product_id"],
-                    "md_product_units_id" => $line["md_product_units_id"],
+                    "md_uom_id" => $line["md_uom_id"],
                     "qty" => $line["qty"],
                     "input_qty" => $line["input_qty"],
                     "md_storage_id" => $request->md_storage_id,
@@ -257,7 +255,7 @@ class MdSupplyController extends Controller
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
             "lines.*.total" => ['required',"numeric"],
-            "lines.*.md_product_units_id" => ['required',"numeric"],
+            "lines.*.md_uom_id" => ['required',"numeric"],
             // "lines.*.uom_type" => ['required',"string"],
             "lines.*.cost" => ['required',"numeric"],
             "lines.*.discount_percent" => ['nullable',"numeric"],
@@ -271,7 +269,8 @@ class MdSupplyController extends Controller
 
         $lines = $data["lines"];
         unset($data["lines"]);
-        $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
+        // $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
+        $rows = MdUomsConversion::qty_conversion($lines,$request->cd_client_id);
         $old_supp = MdSupply::where("id",$id)->first();
         $s_lines = MdSuppliesLine::where("is_deleted",0)->where("md_supply_id",$id)->get();
         $check = [];
@@ -337,7 +336,7 @@ class MdSupplyController extends Controller
         //         return response()->json(["error"=>"no base unit found for this product!","product"=>$key+1]);
         //     }
 
-        //     $unit = MdProductUnit::get_unit($line["md_product_units_id"],$line["md_product_id"],$request->cd_client_id);
+        //     $unit = MdProductUnit::get_unit($line["md_uom_id"],$line["md_product_id"],$request->cd_client_id);
         //     if(!$unit)
         //     {
         //         return response()->json(["error"=>"no selectd unit found for this product!","product"=>$key+1]);
@@ -432,7 +431,7 @@ class MdSupplyController extends Controller
                     "type_id" => $id,
                     "action" => "update",
                     "md_product_id" => $line["md_product_id"],
-                    "md_product_units_id" => $line["md_product_units_id"],
+                    "md_uom_id" => $line["md_uom_id"],
                     "qty" => $line["qty"],
                     "input_qty" => $line["input_qty"],
                     "md_storage_id" => $request->md_storage_id,

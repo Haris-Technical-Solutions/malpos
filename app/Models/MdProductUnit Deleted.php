@@ -79,7 +79,7 @@ class MdProductUnit extends Model
             $line["product_base_unit_id"] = $base_unit->md_uom_id;
             array_push($rows,$line);
             
-        }
+        } 
         return $rows;
     }
 }

@@ -13,6 +13,9 @@ class MdSuppliesLine extends Model
     public function product(){
         return $this->hasOne(MdProduct::class, 'md_product_id',"md_product_id");
     }
+    public function unit(){
+        return $this->hasOne(MdUom::class, 'md_uom_id',"md_uom_id");
+    }
     public function supply(){
         return $this->belongsTo(MdSupply::class, 'id');
     }

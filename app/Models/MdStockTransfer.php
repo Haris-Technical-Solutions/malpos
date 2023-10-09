@@ -14,7 +14,7 @@ class MdStockTransfer extends Model
     }
     public static function getTransfer($id){
         return MdStockTransfer::where("id",$id)
-        ->with(["stock_transfer_lines"])
+        ->with(["stock_transfer_lines.unit.conversion"])
         ->first();
     }
     

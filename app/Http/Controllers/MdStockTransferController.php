@@ -57,7 +57,7 @@ class MdStockTransferController extends Controller
             // 
             "lines.*.md_product_id" => ['required',"numeric"],
             "lines.*.qty" => ['required',"numeric"],
-            "lines.*.md_product_units_id" => ['required',"numeric"],
+            "lines.*.md_uom_id" => ['required',"numeric"],
             // "lines.*.uom_id" => ['required',"string"],
             // "lines.*.uom_type" => ['required',"string"],
         ]);
@@ -82,7 +82,8 @@ class MdStockTransferController extends Controller
             return response()->json(['error' => "To Storage not Found"], 401);
         }
 
-        $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
+        // $rows = MdProductUnit::qty_conversion($lines,$request->cd_client_id);
+        $rows = MdUomsConversion::qty_conversion($lines,$request->cd_client_id);
         $check1 = [];
         $check2 = [];
         // $check3 = [];
@@ -108,7 +109,9 @@ class MdStockTransferController extends Controller
 
 
             $oldstock = MdStock::where("md_storage_id",$data["md_from_storage_id"])
-            ->where("md_product_id",$line["md_product_id"])->where("is_deleted",0)->first();
+            ->where("md_product_id",$line["md_product_id"])
+            ->where("is_deleted",0)
+            ->first();
 
             if($oldstock){
                 array_push($check2,1);
@@ -160,7 +163,7 @@ class MdStockTransferController extends Controller
                     "type_id" => $transfer->id,
                     "action" => "create",
                     "md_product_id" => $oline["md_product_id"],
-                    "md_product_units_id" => $oline["md_product_units_id"],
+                    "md_uom_id" => $oline["md_uom_id"],
                     "qty" => ($oline["qty"]*-1),
                     "input_qty" => ($oline["input_qty"]*-1),
                     "md_storage_id" => $data["md_from_storage_id"],
@@ -175,7 +178,7 @@ class MdStockTransferController extends Controller
                     "type_id" => $transfer->id,
                     "action" => "create",
                     "md_product_id" => $oline["md_product_id"],
-                    "md_product_units_id" => $oline["md_product_units_id"],
+                    "md_uom_id" => $oline["md_uom_id"],
                     "qty" => $oline["qty"],
                     "input_qty" => $oline["input_qty"],
                     "md_storage_id" => $data["md_to_storage_id"],
@@ -187,7 +190,7 @@ class MdStockTransferController extends Controller
                     "md_product_id" => $oline["md_product_id"],
                     "input_qty" => $oline["input_qty"],
                     "qty" => $oline["qty"],
-                    "md_product_units_id" => $oline["md_product_units_id"],
+                    "md_uom_id" => $oline["md_uom_id"],
                     // "uom_type" => $oline["uom_type"]
                 ]);
             }

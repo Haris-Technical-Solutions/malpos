@@ -28,11 +28,11 @@ class MdProduct extends Model
         return $this->belongsTo(MdSupplyLine::class, 'md_product_id');
     }
 
-    // public function unit_conversions(){
-    //     return $this->hasMany(MdProductUnit::class, 'md_product_id');
-    // }
+    public function unit_conversions(){
+        return $this->hasMany(MdUomsConversion::class, 'md_product_id');
+    }
     public function base_unit(){
-        return $this->hasOne(MdProductUnit::class, 'md_product_id');
+        return $this->hasOne(MdUom::class, 'md_uom_id');
     }
     public function product_detail(){
         return $this->hasMany(MdProductDetail::class, 'md_product_id');

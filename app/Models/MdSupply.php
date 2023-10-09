@@ -25,7 +25,8 @@ class MdSupply extends Model
         ->with([
             "supplier:id,supplier_name",
             "storage:id,name,is_active",
-            "supplies_lines.product:md_product_id,product_name"
+            "supplies_lines.product:md_product_id,product_name",
+            "supplies_lines.unit.conversion"
         ])
         ->first();
     }

@@ -12,17 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('md_uoms', function (Blueprint $table) {
-            $table->id("md_uoms_id");
+            $table->id("md_uom_id");
             $table->foreignId('cd_client_id')->on('cd_clients');
             $table->foreignId('cd_brand_id')->on('cd_brands')->nullable();
             $table->foreignId('cd_branch_id')->on('cd_branchs')->nullable();
 
             $table->enum('type',["built_in","user_defined"])->default("user_defined");
+            $table->enum('category',["base","conversion"])->default("base");
             $table->string('code');
             $table->string('symbol');
             $table->string('name');
             
-            $table->boolean('is_active');
+            // $table->boolean('is_active');
+            $table->boolean("is_deleted")->default(0);
             $table->string('created_by');
             $table->string('updated_by');
             $table->timestamps();

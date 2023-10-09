@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('product_code');
             $table->string('product_name');
             $table->string('product_price');
+            $table->foreignId('md_uom_id')->on('md_uoms');
             $table->string('product_image')->nullable();
             $table->string('deleting_method')->nullable();
             $table->string('total_weight')->nullable();

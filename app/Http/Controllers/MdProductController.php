@@ -42,7 +42,8 @@ class MdProductController extends Controller
 
     $query = MdProduct::with([
         'client',
-        "base_unit.conversion",
+        "unit_conversions.uom_to_details",
+        // "base_unit.conversions",
         'product_branch.branch',
         'product_brand.brand',
         'product_product_category.product_category',
@@ -108,6 +109,7 @@ class MdProductController extends Controller
         $data->cd_client_id = $request->input('cd_client_id');
         // $data->cd_brand_id = $request->input('cd_brand_id');
         // $data->cd_branch_id = $request->input('cd_branch_id');
+        $data->md_uom_id = $request->input('md_uom_id');
         $data->is_active = $request->input('is_active', '1');
         $data->created_by = $request->input('created_by');
         $data->updated_by = $request->input('updated_by');
@@ -121,17 +123,17 @@ class MdProductController extends Controller
         $data->save();
         $latestMdProductId = MdProduct::max('md_product_id');
 
-        MdProductUnit::create([
-            "cd_client_id"=> $request->input('cd_client_id'),
-            // "cd_brand_id"=> $request->input('cd_brand_id'),
-            // "cd_branch_id"=> $request->input('cd_branch_id'),
-            "md_product_id"=> $latestMdProductId,
-            "md_uom_id"=>  $request->input('md_uom_id'),
-            "is_active" => 1,
+        // MdProductUnit::create([
+        //     "cd_client_id"=> $request->input('cd_client_id'),
+        //     // "cd_brand_id"=> $request->input('cd_brand_id'),
+        //     // "cd_branch_id"=> $request->input('cd_branch_id'),
+        //     "md_product_id"=> $latestMdProductId,
+        //     "md_uom_id"=>  $request->input('md_uom_id'),
+        //     "is_active" => 1,
             
-            "created_by" => $request->input('created_by'),
-            "updated_by" => $request->input('updated_by'),
-        ]);
+        //     "created_by" => $request->input('created_by'),
+        //     "updated_by" => $request->input('updated_by'),
+        // ]);
 
 
         $product_detail = $request->input('product_detail');
@@ -240,12 +242,14 @@ class MdProductController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit( $id)
+    public static function edit($id)
     {
         //
         // return 1;
         $data = MdProduct::with([
-            "base_unit.conversion",
+            'client',
+            "base_unit",
+            "unit_conversions.uom_to_details",
             'product_brand',
             'product_branch',
             'product_product_category',
@@ -289,6 +293,7 @@ class MdProductController extends Controller
         $data->cd_client_id = $request->input('cd_client_id');
         // $data->cd_brand_id = $request->input('cd_brand_id');
         // $data->cd_branch_id = $request->input('cd_branch_id');
+        $data->md_uom_id = $request->input('md_uom_id');
         $data->is_active = $request->input('is_active', '1');
         $data->created_by = $request->input('created_by');
         $data->updated_by = $request->input('updated_by');
@@ -321,17 +326,17 @@ class MdProductController extends Controller
         $product_diets_delete = MdProductDiet::where('md_product_id', $id)->delete();
 
 
-        MdProductUnit::where("md_product_id", $id)->where("type","unit")->delete();
-        MdProductUnit::create([
-            "cd_client_id"=> $request->input('cd_client_id'),
-            // "cd_brand_id"=> $request->input('cd_brand_id'),
-            // "cd_branch_id"=> $request->input('cd_branch_id'),
-            "md_product_id"=> $id,
-            "md_uom_id"=>  $request->input('md_uom_id'),
-            "is_active" => 1,
-            "created_by" => $request->input('created_by'),
-            "updated_by" => $request->input('updated_by'),
-        ]);
+        // MdProductUnit::where("md_product_id", $id)->where("type","unit")->delete();
+        // MdProductUnit::create([
+        //     "cd_client_id"=> $request->input('cd_client_id'),
+        //     // "cd_brand_id"=> $request->input('cd_brand_id'),
+        //     // "cd_branch_id"=> $request->input('cd_branch_id'),
+        //     "md_product_id"=> $id,
+        //     "md_uom_id"=>  $request->input('md_uom_id'),
+        //     "is_active" => 1,
+        //     "created_by" => $request->input('created_by'),
+        //     "updated_by" => $request->input('updated_by'),
+        // ]);
 
         if ($product_detail) {
             foreach($product_detail as $item){
