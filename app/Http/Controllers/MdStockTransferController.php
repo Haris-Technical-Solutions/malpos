@@ -23,7 +23,7 @@ class MdStockTransferController extends Controller
     public function index()
     {
         return response()->json(MdStockTransfer::
-        with(["stock_transfer_lines"])
+        with(["stock_transfer_lines.product","stock_transfer_lines.unit.conversion"])
         ->simplePaginate(10),200);
     }
 

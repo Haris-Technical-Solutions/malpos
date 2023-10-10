@@ -26,6 +26,7 @@ class MdSupplyController extends Controller
             "supplier:id,supplier_name",
             "storage:id,name,is_active",
             // "supply_lines",
+            "supplies_lines.unit.conversion",
             "supplies_lines.product:md_product_id,product_name"
         ])
         ->simplePaginate(10),200);

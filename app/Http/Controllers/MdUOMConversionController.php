@@ -37,8 +37,8 @@ class MdUOMConversionController extends Controller
 
         $validator = Validator::make($request->all(), [
             "cd_client_id" => ['required',"numeric"],
-            // "cd_brand_id" => ['required',"numeric"],
-            // "cd_branch_id" => ['required',"numeric"],
+            "cd_brand_id" => ['required',"numeric"],
+            "cd_branch_id" => ['required',"numeric"],
             
             "md_product_id" => ["required" , "numeric"],
 
@@ -100,8 +100,8 @@ class MdUOMConversionController extends Controller
         if(!isset($data["uom_to"])){
             $uom = MdUom::create([
                 "cd_client_id" => $data["cd_client_id"],
-                // "cd_brand_id" => $data["cd_brand_id"],
-                // "cd_branch_id" => $data["cd_branch_id"],
+                "cd_brand_id" => $data["cd_brand_id"],
+                "cd_branch_id" => $data["cd_branch_id"],
 
                 "code" => $data["code"],
                 "symbol" => $data["symbol"],
@@ -132,8 +132,8 @@ class MdUOMConversionController extends Controller
         // $data["md_uom_id"] = $base_unit->md_uom_id;
         $uomc = MdUomsConversion::create([
             "cd_client_id" => $data["cd_client_id"],
-            // "cd_brand_id" => $data["cd_brand_id"],
-            // "cd_branch_id" => $data["cd_branch_id"],
+            "cd_brand_id" => $data["cd_brand_id"],
+            "cd_branch_id" => $data["cd_branch_id"],
             "uom_to" => $uom_to,
             "uom_from" => $data["uom_from"],	
             "multiply_rate" => $data["multiply_rate"],	
@@ -273,8 +273,8 @@ class MdUOMConversionController extends Controller
 
         $validator = Validator::make($request->all(), [
             "cd_client_id" => ['required',"numeric"],
-            // "cd_brand_id" => ['required',"numeric"],
-            // "cd_branch_id" => ['required',"numeric"],
+            "cd_brand_id" => ['required',"numeric"],
+            "cd_branch_id" => ['required',"numeric"],
             
             // "md_product_id" => ["required" , "numeric"],
 

@@ -26,6 +26,8 @@ class MdUOMController extends Controller
         
         $validator = Validator::make($request->all(), [
             "cd_client_id" => ['required',"numeric"],
+            // "cd_brand_id" => ['required',"numeric"],
+            // "cd_branch_id" => ['required',"numeric"],
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 401);
@@ -75,7 +77,7 @@ class MdUOMController extends Controller
         $validator = Validator::make($request->all(), [
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
-            "cd_branch_id" => ['required',"numeric"],
+            // "cd_branch_id" => ['required',"numeric"],
             
             "code" => ["required" , "string", Rule::unique('md_uoms')
             ->where("cd_client_id",$request->cd_client_id)],
@@ -128,7 +130,7 @@ class MdUOMController extends Controller
         $validator = Validator::make($request->all(), [
             "cd_client_id" => ['required',"numeric"],
             "cd_brand_id" => ['required',"numeric"],
-            "cd_branch_id" => ['required',"numeric"],
+            // "cd_branch_id" => ['required',"numeric"],
             
             "code" => ["required" , "string",
                 Rule::unique('md_uoms')
