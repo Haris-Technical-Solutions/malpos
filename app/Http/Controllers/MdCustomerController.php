@@ -63,9 +63,9 @@ class MdCustomerController extends Controller
         }
         $data = $validator->validated();
 
-        MdCustomer::create($data);
-        
-        return response()->json(["message"=>"Customer Created Succesfully!","data"=>MdCustomer::getCustomer($data->id)]);
+        $customer = MdCustomer::create($data);
+
+        return response()->json(["message"=>"Customer Created Succesfully!","data"=>MdCustomer::getCustomer($customer->id)]);
     }
 
     /**
@@ -96,7 +96,7 @@ class MdCustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-     
+
         if(!MdCustomer::where("id",$id)->first()){
             return response()->json(["error"=>"Sorry no record Found!"]);
         }
@@ -129,9 +129,9 @@ class MdCustomerController extends Controller
         $data = $validator->validated();
 
         MdCustomer::where("id",$id)->update($data);
-        
+
         return response()->json(["message"=>"Customer Updated Succesfully!","data" => MdCustomer::getCustomer($id)]);
-        
+
     }
 
     /**
