@@ -424,21 +424,22 @@ class MdSupplyController extends Controller
                         "md_product_id" => $line["md_product_id"],
                     ]);
                 }
-                MdStockHistory::create([
-                    "cd_client_id" =>  $request->cd_client_id,
-                    "cd_brand_id" =>  $request->cd_brand_id,
-                    "cd_branch_id" =>  $request->cd_branch_id,
-                    "type" => "supplies",
-                    "type_id" => $id,
-                    "action" => "update",
-                    "md_product_id" => $line["md_product_id"],
-                    "md_uom_id" => $line["md_uom_id"],
-                    "qty" => $line["qty"],
-                    "input_qty" => $line["input_qty"],
-                    "md_storage_id" => $request->md_storage_id,
-                    "created_by" => $request->updated_by,
+                // currently there is no logic for this history mr rizwan
+                // MdStockHistory::create([
+                //     "cd_client_id" =>  $request->cd_client_id,
+                //     "cd_brand_id" =>  $request->cd_brand_id,
+                //     "cd_branch_id" =>  $request->cd_branch_id,
+                //     "type" => "supplies",
+                //     "type_id" => $id,
+                //     "action" => "update",
+                //     "md_product_id" => $line["md_product_id"],
+                //     "md_uom_id" => $line["md_uom_id"],
+                //     "qty" => $line["qty"],
+                //     "input_qty" => $line["input_qty"],
+                //     "md_storage_id" => $request->md_storage_id,
+                //     "created_by" => $request->updated_by,
 
-                ]);
+                // ]);
                 // -----------------------------cost-----------------------------------
                 if($cost){
                     MdProductCost::where('id',$cost->id)->update([

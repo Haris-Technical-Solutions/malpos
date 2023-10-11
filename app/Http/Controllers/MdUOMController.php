@@ -17,7 +17,7 @@ class MdUOMController extends Controller
      */
     public function index()
     {
-        $data = MdUom::paginate(10);
+        $data = MdUom::where("category","base")->paginate(10);
         return response()->json(["data"=>$data],200);
     }
     
@@ -112,7 +112,7 @@ class MdUOMController extends Controller
      */
     public function edit($id)
     {
-        $data = MdUom::where("md_uom_id",$id)->first();
+        $data = MdUom::where("md_uom_id",$id)->where("category","base")->first();
         if(!$data){
             return response()->json(['error' => 'Sorry no record Found!'],200);
         }
