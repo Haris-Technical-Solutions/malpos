@@ -9,8 +9,8 @@ class MdProduct extends Model
 {
     use HasFactory;
 
-    
-  
+
+
     protected $primaryKey = 'md_product_id';
     protected $guarded = ['md_product_id'];
 
@@ -32,7 +32,7 @@ class MdProduct extends Model
         return $this->hasMany(MdUomsConversion::class, 'md_product_id');
     }
     public function base_unit(){
-        return $this->hasOne(MdUom::class, 'md_uom_id');
+        return $this->hasOne(MdUom::class, 'md_uom_id','md_uom_id');
     }
     public function product_detail(){
         return $this->hasMany(MdProductDetail::class, 'md_product_id');
