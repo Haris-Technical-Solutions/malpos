@@ -42,6 +42,8 @@ class MdProductController extends Controller
 
     $query = MdProduct::with([
         'client',
+        // "unit_conversions.uom_to_details",
+        "base_unit",
         "unit_conversions.uom_to_details",
         // "base_unit.conversions",
         'product_branch.branch',
@@ -130,7 +132,7 @@ class MdProductController extends Controller
         //     "md_product_id"=> $latestMdProductId,
         //     "md_uom_id"=>  $request->input('md_uom_id'),
         //     "is_active" => 1,
-            
+
         //     "created_by" => $request->input('created_by'),
         //     "updated_by" => $request->input('updated_by'),
         // ]);
@@ -217,7 +219,8 @@ class MdProductController extends Controller
 
         $data = MdProduct::with([
             'client',
-            "base_unit.conversion",
+            "base_unit",
+            "unit_conversions.uom_to_details",
             'product_branch.branch',
             'product_brand.brand',
             'product_product_category.product_category',
@@ -228,7 +231,7 @@ class MdProductController extends Controller
         ])->where('md_product_id', $latestMdProductId)->get();
 
           return response()->json(['data' => $data]);
-        
+
     }
 
     /**
@@ -275,7 +278,7 @@ class MdProductController extends Controller
         $data->product_price = $request->input('product_price');
         $data->deleting_method = $request->input('deleting_method');
         $data->total_weight = $request->input('total_weight');
-        
+
         $data->barcode = $request->input('barcode');
         $data->maximun_day_of_product_return = $request->input('maximun_day_of_product_return');
         $data->cooking_time = $request->input('cooking_time');
@@ -306,7 +309,7 @@ class MdProductController extends Controller
         }
         $data->save();
 
-      
+
 
         $product_detail = $request->input('product_detail');
         $product_modifiers = $request->input('product_modifiers');

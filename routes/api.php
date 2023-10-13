@@ -244,6 +244,9 @@ Route::post("md_supplier/update/{id}",[MdSupplierController::class,"update"]);
 Route::resource("md_supplies",MdSupplyController::class);
 Route::post("md_supplies/update/{id}",[MdSupplyController::class,"update"]);
 
+Route::resource("md_supplies/return",MdSupplyReturnController::class);
+Route::post("md_supplies/return/update/{id}",[MdSupplyReturnController::class,"update"]);
+
 Route::resource("md_stock_transfer",MdStockTransferController::class);
 Route::post("md_stock_transfer/update/{id}",[MdStockTransferController::class,"update"]);
 
