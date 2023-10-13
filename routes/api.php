@@ -70,6 +70,7 @@ Route::get('product_category/{id?}', [MdProductCategoryController::class, 'index
 Route::post('product_search', [MdProductController::class, 'index'])->name('product_search');
 
 Route::get('product/{id?}', [MdProductController::class, 'index'])->name('product');
+Route::get('raw_products', [MdProductController::class, 'get_all_prod'])->name('product_raw');
 Route::get('product/{id}/edit', [MdProductController::class, 'edit']);
 
 Route::post('product_category_store', [MdProductCategoryController::class, 'store'])->name('product_category_store');

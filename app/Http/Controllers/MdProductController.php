@@ -32,47 +32,89 @@ class MdProductController extends Controller
     // }
 
     public function index(Request $request, $id = null)
-{
-    $search_product = $request->input('search_by_product');
-    $search = $request->input('search');
-    $product_id = $request->input('product_id');
-    // $md_station_id = $request->input('md_station_id');
-    $md_product_category_id = $request->input('md_product_category_id');
-    $gift = $request->input('gift');
+    {
+        $search_product = $request->input('search_by_product');
+        $search = $request->input('search');
+        $product_id = $request->input('product_id');
+        // $md_station_id = $request->input('md_station_id');
+        $md_product_category_id = $request->input('md_product_category_id');
+        $gift = $request->input('gift');
 
-    $query = MdProduct::with([
-        'client',
-        // "unit_conversions.uom_to_details",
-        "base_unit",
-        "unit_conversions.uom_to_details",
-        // "base_unit.conversions",
-        'product_branch.branch',
-        'product_brand.brand',
-        'product_product_category.product_category',
-        'product_detail',
-        'product_modifier.modifier',
-        'product_diet.diet',
-        'product_allergy.allergy',
-    ]);
+        $query = MdProduct::with([
+            'client',
+            // "unit_conversions.uom_to_details",
+            "base_unit",
+            "unit_conversions.uom_to_details",
+            // "base_unit.conversions",
+            'product_branch.branch',
+            'product_brand.brand',
+            'product_product_category.product_category',
+            'product_detail',
+            'product_modifier.modifier',
+            'product_diet.diet',
+            'product_allergy.allergy',
+        ]);
 
 
-    if ($id !== null) {
-        $query->where('md_product_category_id', $id);
+        if ($id !== null) {
+            $query->where('md_product_category_id', $id);
+        }
+
+        if ($search_product) {
+            $query->where(function ($innerQuery) use ($search, $product_id, $md_product_category_id, $gift) {
+                $innerQuery->where('product_name', 'LIKE', "%$search%")
+                    ->orWhere('md_product_id', "$product_id")
+                    ->orWhere('md_product_category_id', $md_product_category_id)
+                    ->orWhere('gift', "$gift");
+            });
+        }
+
+        $products = $query->paginate(10);
+
+        return response()->json(['products' => $products]);
     }
+    public function get_all_prod(Request $request)
+    {
+        // $search_product = $request->input('search_by_product');
+        // $search = $request->input('search');
+        // $product_id = $request->input('product_id');
+        // // $md_station_id = $request->input('md_station_id');
+        // $md_product_category_id = $request->input('md_product_category_id');
+        // $gift = $request->input('gift');
 
-    if ($search_product) {
-        $query->where(function ($innerQuery) use ($search, $product_id, $md_product_category_id, $gift) {
-            $innerQuery->where('product_name', 'LIKE', "%$search%")
-                ->orWhere('md_product_id', "$product_id")
-                ->orWhere('md_product_category_id', $md_product_category_id)
-                ->orWhere('gift', "$gift");
-        });
+        $query = MdProduct::with([
+            'client',
+            // "unit_conversions.uom_to_details",
+            "base_unit",
+            "unit_conversions.uom_to_details",
+            // "base_unit.conversions",
+            'product_branch.branch',
+            'product_brand.brand',
+            'product_product_category.product_category',
+            'product_detail',
+            'product_modifier.modifier',
+            'product_diet.diet',
+            'product_allergy.allergy',
+        ]);
+
+
+        // if ($id !== null) {
+        //     $query->where('md_product_category_id', $id);
+        // }
+
+        // if ($search_product) {
+        //     $query->where(function ($innerQuery) use ($search, $product_id, $md_product_category_id, $gift) {
+        //         $innerQuery->where('product_name', 'LIKE', "%$search%")
+        //             ->orWhere('md_product_id', "$product_id")
+        //             ->orWhere('md_product_category_id', $md_product_category_id)
+        //             ->orWhere('gift', "$gift");
+        //     });
+        // }
+
+        $products = $query->get();
+
+        return response()->json(['products' => $products]);
     }
-
-    $products = $query->paginate(10);
-
-    return response()->json(['products' => $products]);
-}
 
 
     /**
