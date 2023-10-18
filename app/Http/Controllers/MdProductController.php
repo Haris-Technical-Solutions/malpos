@@ -48,7 +48,7 @@ class MdProductController extends Controller
             'product_branch.branch',
             'product_brand.brand',
             'product_product_category.product_category',
-            'product_details',
+            'product_details.product',
             'product_modifier.modifier',
             'product_diet.diet',
             'product_allergy.allergy',
