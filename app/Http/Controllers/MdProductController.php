@@ -341,18 +341,7 @@ class MdProductController extends Controller
         }
 
 
-        $data = MdProduct::with([
-            'client',
-            "base_unit",
-            "unit_conversions.uom_to_details",
-            'product_branch.branch',
-            'product_brand.brand',
-            'product_product_category.product_category',
-            'product_details',
-            'product_modifier.modifier',
-            'product_diet.diet',
-            'product_allergy.allergy',
-        ])->where('md_product_id', $md_product_id)->get();
+        $data = MdProduct::with($this->product_relations)->where('md_product_id', $md_product_id)->get();
 
         return response()->json(["message"=>"Product Created Successfully!", 'data' => $data],200);
 
@@ -753,18 +742,7 @@ class MdProductController extends Controller
         }
 
 
-        $data = MdProduct::with([
-            'client',
-            "base_unit",
-            "unit_conversions.uom_to_details",
-            'product_branch.branch',
-            'product_brand.brand',
-            'product_product_category.product_category',
-            'product_details',
-            'product_modifier.modifier',
-            'product_diet.diet',
-            'product_allergy.allergy',
-        ])
+        $data = MdProduct::with($this->product_relations)
         ->where('md_product_id', $md_product_id)->get();
 
         return response()->json(["message"=>"Product Updated Successfully!",'data' => $data], 200);
