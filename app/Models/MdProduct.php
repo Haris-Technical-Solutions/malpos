@@ -34,7 +34,7 @@ class MdProduct extends Model
     public function base_unit(){
         return $this->hasOne(MdUom::class, 'md_uom_id','md_uom_id');
     }
-    public function product_detail(){
+    public function product_details(){
         return $this->hasMany(MdProductDetail::class, 'md_product_id');
     }
 

@@ -93,6 +93,7 @@ Route::delete('tax_rate_delete/{id}', [TdTaxRateController::class, 'destroy'])->
 
 Route::post('product_store', [MdProductController::class, 'store'])->name('product_store');
 Route::get('product_edit/{id}', [MdProductController::class, 'edit'])->name('product_edit');
+Route::get('product_types', [MdProductController::class, 'product_types'])->name('product_types');
 Route::post('product_update/{id}', [MdProductController::class, 'update'])->name('product_update');
 Route::delete('product_delete/{id}', [MdProductController::class, 'destroy'])->name('product_delete');
 

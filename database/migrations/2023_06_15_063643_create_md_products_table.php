@@ -15,6 +15,13 @@ return new class extends Migration
             $table->id('md_product_id');
             $table->string('product_code');
             $table->string('product_name');
+            $table->enum("type",[
+                "dish",
+                "ready_made",
+                "time_product",
+                "ingredient",
+                "preparation",
+            ])->default("dish");
             $table->string('product_price');
             $table->foreignId('md_uom_id')->on('md_uoms');
             $table->string('product_image')->nullable();
