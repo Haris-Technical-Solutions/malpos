@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('md_product_details', function (Blueprint $table) {
             $table->id('md_product_detail_id');
             $table->foreignId('md_product_id')->on('md_products');
-            $table->integer('md_detail_id');
             $table->enum("detail_type",[
                 "ingredient",
                 "preparation",
             ])->default("dish");
+            $table->bigInteger('md_detail_id');
             $table->foreignId('md_uom_id')->on('md_uoms');
             // $table->string('product_type')->nullable();
-            $table->string('qty');
-            $table->string('cost')->nullable();
+            $table->double('qty');
+            $table->double('cost')->nullable();
             $table->timestamps();
         });
     }
