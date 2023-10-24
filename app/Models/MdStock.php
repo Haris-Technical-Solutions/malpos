@@ -9,14 +9,17 @@ class MdStock extends Model
 {
     use HasFactory;
     protected $guarded = [];
-    
+
     public function product(){
         return $this->hasOne(MdProduct::class, 'md_product_id',"md_product_id");
     }
-    public function supply(){
-        return $this->belongsTo(MdSupply::class, 'id');
-    }
+    // public function supply(){
+    //     return $this->belongsTo(MdSupply::class, 'id');
+    // }
     public function storage(){
         return $this->hasOne(MdStorage::class, 'id',"md_storage_id");
+    }
+    public function base_unit(){
+        return $this->hasOne(MdUom::class, 'md_uom_id','md_uom_id');
     }
 }
